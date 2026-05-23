@@ -1,5 +1,6 @@
 import {
   ChatInputCommandInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import { prisma } from "../db/client.js";
@@ -22,7 +23,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     await prisma.notifySchedule.deleteMany({ where: { userId } });
     await interaction.reply({
       content: "お気に入りを解除しました（DM 通知も停止しました）。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -31,7 +32,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   if (!fav) {
     await interaction.reply({
       content: "お気に入りが未登録です。パネルから登録してください。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -39,11 +40,11 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   if (!region) {
     await interaction.reply({
       content: "登録地域が見つかりません。再登録してください。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const data2 = await fetchForecast(region.lat, region.lon, "3day");
   await interaction.editReply({
     embeds: [buildForecastEmbed(region, "3day", data2)],

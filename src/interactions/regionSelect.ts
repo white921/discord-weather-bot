@@ -1,5 +1,6 @@
 import {
   ActionRowBuilder,
+  MessageFlags,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
   type InteractionReplyOptions,
@@ -24,7 +25,7 @@ export function buildAreaSelect(mode: FlowMode): InteractionReplyOptions {
   return {
     content: mode === "favorite" ? "お気に入り登録: 地方を選んでください。" : "地方を選んでください。",
     components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)],
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   };
 }
 

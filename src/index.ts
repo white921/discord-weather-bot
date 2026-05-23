@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, Interaction } from "discord.js";
+import { Client, Events, GatewayIntentBits, Interaction, MessageFlags } from "discord.js";
 import { COMMANDS } from "./commands/index.js";
 import { registerSlashCommands } from "./registerCommands.js";
 import { handlePanelButton } from "./interactions/panelButtons.js";
@@ -59,7 +59,7 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     console.error("Interaction error:", e);
     if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
       await interaction
-        .reply({ content: "エラーが発生しました。", ephemeral: true })
+        .reply({ content: "エラーが発生しました。", flags: MessageFlags.Ephemeral })
         .catch(() => {});
     }
   }

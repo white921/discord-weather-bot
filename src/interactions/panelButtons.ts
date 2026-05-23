@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
+  MessageFlags,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -30,7 +31,7 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
     if (!fav) {
       await interaction.reply({
         content: "⭐ お気に入りが未登録です。「📝 お気に入りを登録/変更」から設定してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -38,11 +39,11 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
     if (!region) {
       await interaction.reply({
         content: "登録地域が見つかりません。再登録してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     try {
       const data = await fetchForecast(region.lat, region.lon, "3day");
       await interaction.editReply({
@@ -62,7 +63,7 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
     if (!fav) {
       await interaction.reply({
         content: "🔔 DM 通知はお気に入り地域に対して送信します。先に「📝 お気に入りを登録/変更」してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -96,7 +97,7 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
         deleted.count > 0
           ? "🔕 DM 通知を停止しました。"
           : "通知設定はありませんでした。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }

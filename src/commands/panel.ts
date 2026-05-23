@@ -1,5 +1,6 @@
 import {
   ChatInputCommandInteraction,
+  MessageFlags,
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
@@ -15,10 +16,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   if (!interaction.channel || !("send" in interaction.channel)) {
     await interaction.reply({
       content: "このチャンネルには設置できません。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
   await interaction.channel.send(buildPanelMessage());
-  await interaction.reply({ content: "パネルを設置しました。", ephemeral: true });
+  await interaction.reply({ content: "パネルを設置しました。", flags: MessageFlags.Ephemeral });
 }

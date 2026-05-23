@@ -1,4 +1,4 @@
-import { ModalSubmitInteraction } from "discord.js";
+import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import { prisma } from "../db/client.js";
 
 const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -9,7 +9,7 @@ export async function handleNotifyModal(interaction: ModalSubmitInteraction) {
   if (!m) {
     await interaction.reply({
       content: "時刻の形式が不正です。`HH:MM` (例: 07:00) で入力してください。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -21,7 +21,7 @@ export async function handleNotifyModal(interaction: ModalSubmitInteraction) {
   if (!fav) {
     await interaction.reply({
       content: "お気に入りが未登録です。先に登録してください。",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
     return;
   }
@@ -34,6 +34,6 @@ export async function handleNotifyModal(interaction: ModalSubmitInteraction) {
 
   await interaction.reply({
     content: `🔔 毎日 ${m[1]}:${m[2]} (JST) に DM で予報を送ります。`,
-    ephemeral: true,
+    flags: MessageFlags.Ephemeral,
   });
 }
