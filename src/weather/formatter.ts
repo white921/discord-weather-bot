@@ -78,7 +78,7 @@ export function buildForecastText(
       if (t < now) continue;
       const w = wmo(data.hourly.weather_code[i]);
       rows.push(
-        `${fmtHour(data.hourly.time[i])}  ${pad(w.emoji + " " + w.label, 14)}  ${pad(data.hourly.temperature_2m[i] + "°C", 6)}  ☔ ${data.hourly.precipitation_probability[i] ?? 0}%`
+        `${fmtHour(data.hourly.time[i])}  ${pad(w.emoji + " " + w.label, 10)}  ${pad(data.hourly.temperature_2m[i] + "°C", 6)}  ☔ ${data.hourly.precipitation_probability[i] ?? 0}%`
       );
       if (rows.length >= 8) break;
     }
@@ -100,13 +100,13 @@ export function buildForecastText(
       if (am) {
         const w = wmo(am.code);
         rows.push(
-          `  午前  ${pad(w.emoji + " " + w.label, 14)}  ${pad(am.maxTemp + "°C", 6)}  ☔ ${am.maxPrecip}%`
+          `  午前  ${pad(w.emoji + " " + w.label, 10)}  ${pad(am.maxTemp + "°C", 6)}  ☔ ${am.maxPrecip}%`
         );
       }
       if (pm) {
         const w = wmo(pm.code);
         rows.push(
-          `  午後  ${pad(w.emoji + " " + w.label, 14)}  ${pad(pm.maxTemp + "°C", 6)}  ☔ ${pm.maxPrecip}%`
+          `  午後  ${pad(w.emoji + " " + w.label, 10)}  ${pad(pm.maxTemp + "°C", 6)}  ☔ ${pm.maxPrecip}%`
         );
       }
       if (d < data.daily.time.length - 1) rows.push("");
@@ -118,7 +118,7 @@ export function buildForecastText(
   const rows = data.daily.time.map((iso, i) => {
     const w = wmo(data.daily.weather_code[i]);
     const date = pad(fmtDate(iso), 10);
-    const cond = pad(w.emoji + " " + w.label, 14);
+    const cond = pad(w.emoji + " " + w.label, 10);
     const temp = pad(`${data.daily.temperature_2m_max[i]}°C / ${data.daily.temperature_2m_min[i]}°C`, 12);
     return `${date}  ${cond}  ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`;
   });
