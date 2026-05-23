@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model UserFavorite {
+  userId        String   @id @db.VarChar(32)
+  subdivisionId String   @db.VarChar(64)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model NotifySchedule {
+  userId     String    @id @db.VarChar(32)
+  hour       Int
+  minute     Int
+  enabled    Boolean   @default(true)
+  lastSentAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([enabled, hour, minute])
+}

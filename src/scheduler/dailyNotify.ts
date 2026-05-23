@@ -1,0 +1,58 @@
+import { Client } from "discord.js";
+import cron from "node-cron";
+import { prisma } from "../db/client.js";
+import { findSubdivision } from "../data/regions.js";
+import { fetchForecast } from "../weather/openMeteo.js";
+import { buildForecastEmbed } from "../weather/formatter.js";
+
+function jstNow(): { hour: number; minute: number } {
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Tokyo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(new Date());
+  const hour = Number(parts.find((p) => p.type === "hour")!.value);
+  const minute = Number(parts.find((p) => p.type === "minute")!.value);
+  return { hour, minute };
+}
+
+export function startScheduler(client: Client) {
+  cron.schedule("* * * * *", async () => {
+    const { hour, minute } = jstNow();
+    const targets = await prisma.notifySchedule.findMany({
+      where: { enabled: true, hour, minute },
+    });
+    for (const t of targets) {
+      try {
+        const fav = await prisma.userFavorite.findUnique({
+          where: { userId: t.userId },
+        });
+        if (!fav) {
+          await prisma.notifySchedule.update({
+            where: { userId: t.userId },
+            data: { enabled: false },
+          });
+          continue;
+        }
+        const region = findSubdivision(fav.subdivisionId);
+        if (!region) continue;
+        const data = await fetchForecast(region.lat, region.lon, "3day");
+        const user = await client.users.fetch(t.userId);
+        await user.send({ embeds: [buildForecastEmbed(region, "3day", data)] });
+        await prisma.notifySchedule.update({
+          where: { userId: t.userId },
+          data: { lastSentAt: new Date() },
+        });
+      } catch (e) {
+        console.error(`[notify] failed for ${t.userId}:`, e);
+        await prisma.notifySchedule.update({
+          where: { userId: t.userId },
+          data: { enabled: false },
+        }).catch(() => {});
+      }
+    }
+  });
+  console.log("[scheduler] daily notify cron started");
+}
