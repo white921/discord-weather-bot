@@ -41,7 +41,7 @@ export async function fetchForecast(
     daily:
       "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
   });
-  if (range === "today") {
+  if (range === "today" || range === "3day") {
     params.set(
       "hourly",
       "temperature_2m,precipitation_probability,weather_code"

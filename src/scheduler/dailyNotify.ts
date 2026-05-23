@@ -3,7 +3,7 @@ import cron from "node-cron";
 import { prisma } from "../db/client.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
-import { buildForecastText } from "../weather/formatter.js";
+import { buildForecastText, buildRangeButtons } from "../weather/formatter.js";
 
 function jstNow(): { hour: number; minute: number } {
   const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -54,7 +54,10 @@ export function startScheduler(client: Client) {
         console.log(`[notify] ${t.userId}: fetching forecast for ${region.name}`);
         const data = await fetchForecast(region.lat, region.lon, "today");
         const user = await client.users.fetch(t.userId);
-        await user.send({ content: buildForecastText(region, "today", data) });
+        await user.send({
+          content: buildForecastText(region, "today", data),
+          components: [buildRangeButtons(region.id, "today")],
+        });
         console.log(`[notify] ${t.userId}: sent`);
         await prisma.notifySchedule.update({
           where: { userId: t.userId },

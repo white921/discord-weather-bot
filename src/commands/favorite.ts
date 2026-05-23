@@ -45,9 +45,9 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-  const data2 = await fetchForecast(region.lat, region.lon, "3day");
+  const data2 = await fetchForecast(region.lat, region.lon, "today");
   await interaction.editReply({
-    content: buildForecastText(region, "3day", data2),
-    components: [buildRangeButtons(region.id, "3day")],
+    content: buildForecastText(region, "today", data2),
+    components: [buildRangeButtons(region.id, "today")],
   });
 }

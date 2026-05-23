@@ -60,11 +60,11 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
     }
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     try {
-      const data = await fetchForecast(region.lat, region.lon, "3day");
+      const data = await fetchForecast(region.lat, region.lon, "today");
       await interaction.editReply({
-        content: buildForecastText(region, "3day", data),
+        content: buildForecastText(region, "today", data),
         embeds: [],
-        components: [buildRangeButtons(region.id, "3day")],
+        components: [buildRangeButtons(region.id, "today")],
       });
     } catch (e) {
       await interaction.editReply({

@@ -87,6 +87,32 @@ export function buildForecastText(
       .join("\n");
   }
 
+  if (range === "3day" && data.hourly) {
+    const rows: string[] = [];
+    for (let d = 0; d < data.daily.time.length; d++) {
+      const dayIso = data.daily.time[d];
+      const dayStr = dayIso.slice(0, 10);
+      const am = aggregateHalfDay(data.hourly, dayStr, 0, 11);
+      const pm = aggregateHalfDay(data.hourly, dayStr, 12, 23);
+      const date = pad(fmtDate(dayIso), 10);
+      if (am) {
+        const w = wmo(am.code);
+        rows.push(
+          `${date}  午前  ${pad(w.emoji + " " + w.label, 14)}  ${pad(am.maxTemp + "°C", 6)}  ☔ ${am.maxPrecip}%`
+        );
+      }
+      if (pm) {
+        const w = wmo(pm.code);
+        rows.push(
+          `${pad("", 10)}  午後  ${pad(w.emoji + " " + w.label, 14)}  ${pad(pm.maxTemp + "°C", 6)}  ☔ ${pm.maxPrecip}%`
+        );
+      }
+      if (d < data.daily.time.length - 1) rows.push("");
+    }
+    const table = "```\n" + rows.join("\n") + "\n```";
+    return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
+  }
+
   const rows = data.daily.time.map((iso, i) => {
     const w = wmo(data.daily.weather_code[i]);
     const date = pad(fmtDate(iso), 10);
@@ -97,6 +123,30 @@ export function buildForecastText(
   const table = "```\n" + rows.join("\n") + "\n```";
 
   return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
+}
+
+function aggregateHalfDay(
+  hourly: NonNullable<OpenMeteoResponse["hourly"]>,
+  dayStr: string,
+  fromHour: number,
+  toHour: number
+): { code: number; maxTemp: number; maxPrecip: number } | null {
+  const idx: number[] = [];
+  for (let i = 0; i < hourly.time.length; i++) {
+    const t = hourly.time[i];
+    if (t.slice(0, 10) !== dayStr) continue;
+    const h = new Date(t).getHours();
+    if (h >= fromHour && h <= toHour) idx.push(i);
+  }
+  if (idx.length === 0) return null;
+  const maxTemp = Math.max(...idx.map((i) => hourly.temperature_2m[i]));
+  const maxPrecip = Math.max(
+    ...idx.map((i) => hourly.precipitation_probability[i] ?? 0)
+  );
+  const worstCode = idx
+    .map((i) => hourly.weather_code[i])
+    .reduce((a, b) => (b > a ? b : a), 0);
+  return { code: worstCode, maxTemp, maxPrecip };
 }
 
 export function buildRangeButtons(
