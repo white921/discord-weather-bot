@@ -36,15 +36,41 @@ function wmo(code: number) {
   return WMO[code] ?? { label: `code ${code}`, emoji: "❔" };
 }
 
+// Open-Meteo returns naive ISO strings ("2026-05-23T23:00") expressed in the
+// requested timezone — without a TZ suffix. Parsing them via `new Date()`
+// applies the server's local TZ (often UTC on Railway), which corrupts the
+// wall-clock. We therefore parse the components by string slicing.
+
 function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  const wd = ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
-  return `${d.getMonth() + 1}/${d.getDate()}(${wd})`;
+  const y = Number(iso.slice(0, 4));
+  const m = Number(iso.slice(5, 7));
+  const d = Number(iso.slice(8, 10));
+  // Compute weekday in UTC to keep it deterministic regardless of server TZ.
+  const wd = ["日", "月", "火", "水", "木", "金", "土"][
+    new Date(Date.UTC(y, m - 1, d)).getUTCDay()
+  ];
+  return `${m}/${d}(${wd})`;
 }
 
 function fmtHour(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getHours().toString().padStart(2, "0")}:00`;
+  return iso.slice(11, 13) + ":00";
+}
+
+// "Now" expressed in the location's timezone as a naive string
+// ("YYYY-MM-DDTHH:MM"), comparable lexicographically against Open-Meteo's
+// hourly.time entries (which are in the same TZ, also naive).
+function nowInTz(tz: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 
 function pad(s: string | number, width: number): string {
@@ -71,10 +97,11 @@ export function buildForecastText(
       `### ${fmtDate(data.daily.time[0])} ${dayInfo.emoji} ${dayInfo.label}\n` +
       `最高 **${data.daily.temperature_2m_max[0]}°C** / 最低 **${data.daily.temperature_2m_min[0]}°C** / 降水確率 **${data.daily.precipitation_probability_max[0] ?? 0}%**`;
 
-    const now = new Date();
+    const nowStr = nowInTz(data.timezone);
     const rows: string[] = [];
     // Find first future hourly index, then step every 3 hours for 8 rows (24h window).
-    let start = data.hourly.time.findIndex((iso) => new Date(iso) >= now);
+    // Compare as strings — both sides are naive wall-clock in the same TZ.
+    let start = data.hourly.time.findIndex((iso) => iso >= nowStr);
     if (start < 0) start = 0;
     for (let k = 0; k < 8; k++) {
       const i = start + k * 3;
