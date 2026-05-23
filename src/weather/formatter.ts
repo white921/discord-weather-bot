@@ -61,9 +61,7 @@ export function buildForecastText(
   range: ForecastRange,
   data: OpenMeteoResponse
 ): string {
-  const title =
-    sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`;
-  const header = `## 🌤️ ${title} の天気予報`;
+  const header = `## 🌤️ ${sub.name} の天気予報`;
 
   if (range === "today" && data.hourly) {
     const dayInfo = wmo(data.daily.weather_code[0]);
