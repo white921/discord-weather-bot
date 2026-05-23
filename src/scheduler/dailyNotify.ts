@@ -52,7 +52,7 @@ export function startScheduler(client: Client) {
           continue;
         }
         console.log(`[notify] ${t.userId}: fetching forecast for ${region.name}`);
-        const data = await fetchForecast(region.lat, region.lon, "today");
+        const data = await fetchForecast(region.lat, region.lon, "today", region.tz);
         const user = await client.users.fetch(t.userId);
         await user.send({
           content: buildForecastText(region, "today", data),

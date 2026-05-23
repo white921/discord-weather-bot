@@ -60,7 +60,7 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
     }
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
     try {
-      const data = await fetchForecast(region.lat, region.lon, "today");
+      const data = await fetchForecast(region.lat, region.lon, "today", region.tz);
       await interaction.editReply({
         content: buildForecastText(region, "today", data),
         embeds: [],

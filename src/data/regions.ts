@@ -3,6 +3,7 @@ export type Subdivision = {
   name: string;
   lat: number;
   lon: number;
+  tz?: string;
 };
 
 export type Prefecture = {
@@ -309,11 +310,28 @@ export const AREAS: Area[] = [
 
 export type SubdivisionWithPref = Subdivision & { prefName: string; prefId: string };
 
-export const ALL_SUBDIVISIONS: SubdivisionWithPref[] = AREAS.flatMap((a) =>
+import { ALL_INTL_CITIES } from "./international.js";
+
+const JP_SUBDIVISIONS: SubdivisionWithPref[] = AREAS.flatMap((a) =>
   a.prefectures.flatMap((p) =>
-    p.subdivisions.map((s) => ({ ...s, prefName: p.name, prefId: p.id }))
+    p.subdivisions.map((s) => ({ ...s, prefName: p.name, prefId: p.id, tz: s.tz ?? "Asia/Tokyo" }))
   )
 );
+
+const INTL_SUBDIVISIONS: SubdivisionWithPref[] = ALL_INTL_CITIES.map((c) => ({
+  id: c.id,
+  name: c.name,
+  lat: c.lat,
+  lon: c.lon,
+  tz: c.tz,
+  prefName: c.countryName,
+  prefId: c.countryId,
+}));
+
+export const ALL_SUBDIVISIONS: SubdivisionWithPref[] = [
+  ...JP_SUBDIVISIONS,
+  ...INTL_SUBDIVISIONS,
+];
 
 export function findSubdivision(id: string): SubdivisionWithPref | undefined {
   return ALL_SUBDIVISIONS.find((s) => s.id === id);

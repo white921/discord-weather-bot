@@ -3,6 +3,7 @@ import { COMMANDS } from "./commands/index.js";
 import { registerSlashCommands } from "./registerCommands.js";
 import { handlePanelButton } from "./interactions/panelButtons.js";
 import { handleRegionButton } from "./interactions/regionSelect.js";
+import { handleIntlButton } from "./interactions/internationalSelect.js";
 import { handleRangeButton } from "./interactions/forecastRange.js";
 import { handleNotifyModal } from "./interactions/notifyModal.js";
 import { startScheduler } from "./scheduler/dailyNotify.js";
@@ -61,6 +62,8 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         await handlePanelButton(interaction);
       } else if (interaction.customId.startsWith("region:")) {
         await handleRegionButton(interaction);
+      } else if (interaction.customId.startsWith("intl:")) {
+        await handleIntlButton(interaction);
       } else if (interaction.customId.startsWith("range:")) {
         await handleRangeButton(interaction);
       }

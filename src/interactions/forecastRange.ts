@@ -16,7 +16,7 @@ export async function handleRangeButton(interaction: ButtonInteraction) {
   }
   await interaction.deferUpdate();
   try {
-    const data = await fetchForecast(region.lat, region.lon, range);
+    const data = await fetchForecast(region.lat, region.lon, range, region.tz);
     await interaction.editReply({
       content: buildForecastText(region, range, data),
       embeds: [],

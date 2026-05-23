@@ -84,7 +84,7 @@ export function buildForecastText(
     }
     const table = rows.length ? "```\n" + rows.join("\n") + "\n```" : "";
 
-    return [header, "", summary, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"]
+    return [header, "", summary, "", table, `-# 出典: Open-Meteo (${data.timezone})`]
       .filter(Boolean)
       .join("\n");
   }
@@ -112,7 +112,7 @@ export function buildForecastText(
       if (d < data.daily.time.length - 1) rows.push("");
     }
     const table = "```\n" + rows.join("\n") + "\n```";
-    return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
+    return [header, "", table, `-# 出典: Open-Meteo (${data.timezone})`].join("\n");
   }
 
   const rows: string[] = [];
@@ -126,7 +126,7 @@ export function buildForecastText(
   }
   const table = "```\n" + rows.join("\n") + "\n```";
 
-  return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
+  return [header, "", table, `-# 出典: Open-Meteo (${data.timezone})`].join("\n");
 }
 
 function aggregateHalfDay(

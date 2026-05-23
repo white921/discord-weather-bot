@@ -29,13 +29,14 @@ const BASE = "https://api.open-meteo.com/v1/forecast";
 export async function fetchForecast(
   lat: number,
   lon: number,
-  range: ForecastRange
+  range: ForecastRange,
+  timezone: string = "Asia/Tokyo"
 ): Promise<OpenMeteoResponse> {
   const days = range === "today" ? 1 : range === "3day" ? 3 : 7;
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
-    timezone: "Asia/Tokyo",
+    timezone,
     forecast_days: days.toString(),
     current: "temperature_2m,weather_code",
     daily:

@@ -45,7 +45,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-  const data2 = await fetchForecast(region.lat, region.lon, "today");
+  const data2 = await fetchForecast(region.lat, region.lon, "today", region.tz);
   await interaction.editReply({
     content: buildForecastText(region, "today", data2),
     components: [buildRangeButtons(region.id, "today")],

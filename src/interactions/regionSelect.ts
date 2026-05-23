@@ -37,6 +37,12 @@ export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
       .setLabel(a.name)
       .setStyle(ButtonStyle.Secondary)
   );
+  buttons.push(
+    new ButtonBuilder()
+      .setCustomId(`intl:cont:${mode}:start`)
+      .setLabel("🌍 海外")
+      .setStyle(ButtonStyle.Primary)
+  );
   return {
     content:
       mode === "favorite"
@@ -45,6 +51,14 @@ export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
     components: buttonsToRows(buttons),
     flags: MessageFlags.Ephemeral,
   };
+}
+
+export async function finalizeForecast(
+  interaction: ButtonInteraction,
+  mode: FlowMode,
+  subdivisionId: string
+) {
+  await finalize(interaction, mode, subdivisionId);
 }
 
 function buildPrefRows(mode: FlowMode, areaId: string) {
@@ -147,7 +161,7 @@ async function finalize(
 
   await interaction.update({ content: "予報を取得中…", components: [] });
   try {
-    const data = await fetchForecast(region.lat, region.lon, "today");
+    const data = await fetchForecast(region.lat, region.lon, "today", region.tz);
     await interaction.editReply({
       content: buildForecastText(region, "today", data),
       embeds: [],
