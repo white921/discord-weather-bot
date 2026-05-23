@@ -48,17 +48,20 @@ export async function fetchForecast(
     );
   }
 
-  const ac = new AbortController();
-  const timer = setTimeout(() => ac.abort(), 5000);
-  try {
-    const res = await fetch(`${BASE}?${params.toString()}`, {
-      signal: ac.signal,
-    });
-    if (!res.ok) {
-      throw new Error(`Open-Meteo HTTP ${res.status}`);
+  const url = `${BASE}?${params.toString()}`;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 15000);
+    try {
+      const res = await fetch(url, { signal: ac.signal });
+      if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
+      return (await res.json()) as OpenMeteoResponse;
+    } catch (e) {
+      lastErr = e;
+    } finally {
+      clearTimeout(timer);
     }
-    return (await res.json()) as OpenMeteoResponse;
-  } finally {
-    clearTimeout(timer);
   }
+  throw lastErr;
 }

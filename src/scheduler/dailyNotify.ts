@@ -46,11 +46,20 @@ export function startScheduler(client: Client) {
           data: { lastSentAt: new Date() },
         });
       } catch (e) {
-        console.error(`[notify] failed for ${t.userId}:`, e);
-        await prisma.notifySchedule.update({
-          where: { userId: t.userId },
-          data: { enabled: false },
-        }).catch(() => {});
+        const code = (e as { code?: number }).code;
+        const isDmBlocked = code === 50007;
+        console.error(
+          `[notify] failed for ${t.userId} (disable=${isDmBlocked}):`,
+          e
+        );
+        if (isDmBlocked) {
+          await prisma.notifySchedule
+            .update({
+              where: { userId: t.userId },
+              data: { enabled: false },
+            })
+            .catch(() => {});
+        }
       }
     }
   });
