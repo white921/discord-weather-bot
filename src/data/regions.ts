@@ -177,8 +177,8 @@ export const AREAS: Area[] = [
         { id: "kyoto-north", name: "北部", lat: 35.5396, lon: 135.1955 },
       ]},
       { id: "osaka", name: "大阪府", subdivisions: [
-        { id: "osaka-north", name: "大阪府北部", lat: 34.7500, lon: 135.5000 },
-        { id: "osaka-south", name: "大阪府南部", lat: 34.4500, lon: 135.5500 },
+        { id: "osaka-north", name: "北部", lat: 34.7500, lon: 135.5000 },
+        { id: "osaka-south", name: "南部", lat: 34.4500, lon: 135.5500 },
       ]},
       { id: "hyogo", name: "兵庫県", subdivisions: [
         { id: "hyogo-south-east", name: "南部", lat: 34.6913, lon: 135.1830 },
