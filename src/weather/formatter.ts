@@ -115,13 +115,15 @@ export function buildForecastText(
     return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
   }
 
-  const rows = data.daily.time.map((iso, i) => {
+  const rows: string[] = [];
+  for (let i = 0; i < data.daily.time.length; i++) {
     const w = wmo(data.daily.weather_code[i]);
-    const date = pad(fmtDate(iso), 10);
+    rows.push(`[ ${fmtDate(data.daily.time[i])} ]`);
     const cond = pad(w.emoji + " " + w.label, 10);
     const temp = pad(`${data.daily.temperature_2m_max[i]}°C / ${data.daily.temperature_2m_min[i]}°C`, 12);
-    return `${date}  ${cond}  ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`;
-  });
+    rows.push(`  ${cond}  ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`);
+    if (i < data.daily.time.length - 1) rows.push("");
+  }
   const table = "```\n" + rows.join("\n") + "\n```";
 
   return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
