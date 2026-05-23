@@ -27,10 +27,13 @@ export const AREAS: Area[] = [
         name: "北海道",
         subdivisions: [
           { id: "hokkaido-soya", name: "宗谷地方", lat: 45.4154, lon: 141.6731 },
-          { id: "hokkaido-kamikawa", name: "上川地方", lat: 43.7706, lon: 142.365 },
-          { id: "hokkaido-ishikari", name: "石狩地方", lat: 43.0642, lon: 141.3469 },
+          { id: "hokkaido-kamikawa", name: "上川・留萌地方", lat: 43.7706, lon: 142.365 },
+          { id: "hokkaido-abashiri", name: "網走・北見・紋別地方", lat: 44.0207, lon: 144.2734 },
+          { id: "hokkaido-ishikari", name: "石狩・空知・後志地方", lat: 43.0642, lon: 141.3469 },
+          { id: "hokkaido-iburi", name: "胆振・日高地方", lat: 42.3153, lon: 140.9737 },
+          { id: "hokkaido-oshima", name: "渡島・檜山地方", lat: 41.7687, lon: 140.7288 },
           { id: "hokkaido-tokachi", name: "十勝地方", lat: 42.9237, lon: 143.1962 },
-          { id: "hokkaido-kushiro", name: "釧路地方", lat: 42.985, lon: 144.3819 },
+          { id: "hokkaido-kushiro", name: "釧路・根室地方", lat: 42.985, lon: 144.3819 },
         ],
       },
     ],
@@ -46,15 +49,18 @@ export const AREAS: Area[] = [
       ]},
       { id: "iwate", name: "岩手県", subdivisions: [
         { id: "iwate-inland", name: "内陸", lat: 39.7036, lon: 141.1527 },
-        { id: "iwate-coast", name: "沿岸", lat: 39.3408, lon: 141.9559 },
+        { id: "iwate-coast-north", name: "沿岸北部", lat: 39.6418, lon: 141.9568 },
+        { id: "iwate-coast-south", name: "沿岸南部", lat: 39.0822, lon: 141.7080 },
       ]},
       { id: "miyagi", name: "宮城県", subdivisions: [
         { id: "miyagi-east", name: "東部", lat: 38.2682, lon: 140.8694 },
         { id: "miyagi-west", name: "西部", lat: 38.5904, lon: 140.5747 },
       ]},
       { id: "akita", name: "秋田県", subdivisions: [
-        { id: "akita-coast", name: "沿岸", lat: 39.7186, lon: 140.1024 },
-        { id: "akita-inland", name: "内陸", lat: 39.4448, lon: 140.5634 },
+        { id: "akita-coast-north", name: "沿岸北部", lat: 40.2125, lon: 140.0273 },
+        { id: "akita-coast-south", name: "沿岸南部", lat: 39.7186, lon: 140.1024 },
+        { id: "akita-inland-north", name: "内陸北部", lat: 40.2155, lon: 140.7869 },
+        { id: "akita-inland-south", name: "内陸南部", lat: 39.3094, lon: 140.5666 },
       ]},
       { id: "yamagata", name: "山形県", subdivisions: [
         { id: "yamagata-village", name: "村山", lat: 38.2404, lon: 140.3633 },
@@ -171,7 +177,8 @@ export const AREAS: Area[] = [
         { id: "kyoto-north", name: "北部", lat: 35.5396, lon: 135.1955 },
       ]},
       { id: "osaka", name: "大阪府", subdivisions: [
-        { id: "osaka-central", name: "大阪府", lat: 34.6937, lon: 135.5023 },
+        { id: "osaka-north", name: "大阪府北部", lat: 34.7500, lon: 135.5000 },
+        { id: "osaka-south", name: "大阪府南部", lat: 34.4500, lon: 135.5500 },
       ]},
       { id: "hyogo", name: "兵庫県", subdivisions: [
         { id: "hyogo-south-east", name: "南部", lat: 34.6913, lon: 135.1830 },
@@ -225,7 +232,8 @@ export const AREAS: Area[] = [
         { id: "tokushima-south", name: "南部", lat: 33.5538, lon: 134.1888 },
       ]},
       { id: "kagawa", name: "香川県", subdivisions: [
-        { id: "kagawa-all", name: "香川県", lat: 34.3401, lon: 134.0434 },
+        { id: "kagawa-east", name: "東部", lat: 34.3401, lon: 134.0434 },
+        { id: "kagawa-west", name: "西部", lat: 34.2843, lon: 133.7900 },
       ]},
       { id: "ehime", name: "愛媛県", subdivisions: [
         { id: "ehime-central", name: "中予", lat: 33.8416, lon: 132.7657 },
@@ -286,6 +294,7 @@ export const AREAS: Area[] = [
       { id: "okinawa", name: "沖縄県", subdivisions: [
         { id: "okinawa-main", name: "本島中南部", lat: 26.2124, lon: 127.6809 },
         { id: "okinawa-north", name: "本島北部", lat: 26.6948, lon: 128.0181 },
+        { id: "okinawa-kume", name: "久米島", lat: 26.3433, lon: 126.8056 },
         { id: "okinawa-daito", name: "大東島地方", lat: 25.8281, lon: 131.2333 },
         { id: "okinawa-miyako", name: "宮古島地方", lat: 24.8054, lon: 125.2811 },
         { id: "okinawa-yaeyama", name: "八重山地方", lat: 24.3406, lon: 124.1556 },
