@@ -52,9 +52,9 @@ export function startScheduler(client: Client) {
           continue;
         }
         console.log(`[notify] ${t.userId}: fetching forecast for ${region.name}`);
-        const data = await fetchForecast(region.lat, region.lon, "3day");
+        const data = await fetchForecast(region.lat, region.lon, "today");
         const user = await client.users.fetch(t.userId);
-        await user.send({ embeds: [buildForecastEmbed(region, "3day", data)] });
+        await user.send({ embeds: [buildForecastEmbed(region, "today", data)] });
         console.log(`[notify] ${t.userId}: sent`);
         await prisma.notifySchedule.update({
           where: { userId: t.userId },
