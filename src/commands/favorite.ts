@@ -6,7 +6,7 @@ import {
 import { prisma } from "../db/client.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
-import { buildForecastEmbed, buildRangeButtons } from "../weather/formatter.js";
+import { buildForecastText, buildRangeButtons } from "../weather/formatter.js";
 
 export const data = new SlashCommandBuilder()
   .setName("favorite")
@@ -47,7 +47,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const data2 = await fetchForecast(region.lat, region.lon, "3day");
   await interaction.editReply({
-    embeds: [buildForecastEmbed(region, "3day", data2)],
+    content: buildForecastText(region, "3day", data2),
     components: [buildRangeButtons(region.id, "3day")],
   });
 }

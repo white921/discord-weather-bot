@@ -1,7 +1,7 @@
 import { ButtonInteraction } from "discord.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast, type ForecastRange } from "../weather/openMeteo.js";
-import { buildForecastEmbed, buildRangeButtons } from "../weather/formatter.js";
+import { buildForecastText, buildRangeButtons } from "../weather/formatter.js";
 
 export async function handleRangeButton(interaction: ButtonInteraction) {
   const [, range, subId] = interaction.customId.split(":") as [
@@ -18,7 +18,8 @@ export async function handleRangeButton(interaction: ButtonInteraction) {
   try {
     const data = await fetchForecast(region.lat, region.lon, range);
     await interaction.editReply({
-      embeds: [buildForecastEmbed(region, range, data)],
+      content: buildForecastText(region, range, data),
+      embeds: [],
       components: [buildRangeButtons(region.id, range)],
     });
   } catch (e) {

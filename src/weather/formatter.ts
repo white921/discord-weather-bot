@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  EmbedBuilder,
 } from "discord.js";
 import type { Subdivision } from "../data/regions.js";
 import type { ForecastRange, OpenMeteoResponse } from "./openMeteo.js";
@@ -48,47 +47,56 @@ function fmtHour(iso: string): string {
   return `${d.getHours().toString().padStart(2, "0")}:00`;
 }
 
-export function buildForecastEmbed(
+function pad(s: string | number, width: number): string {
+  const str = String(s);
+  let visualLen = 0;
+  for (const ch of str) {
+    visualLen += /[　-鿿＀-￯]/.test(ch) ? 2 : 1;
+  }
+  return str + " ".repeat(Math.max(0, width - visualLen));
+}
+
+export function buildForecastText(
   sub: Subdivision,
   range: ForecastRange,
   data: OpenMeteoResponse
-): EmbedBuilder {
-  const embed = new EmbedBuilder()
-    .setTitle(`🌤️ ${sub.name} の天気予報`)
-    .setColor(0x4a90e2)
-    .setTimestamp(new Date());
+): string {
+  const header = `## 🌤️ ${sub.name} の天気予報`;
 
   if (range === "today" && data.hourly) {
     const dayInfo = wmo(data.daily.weather_code[0]);
-    embed.setDescription(
-      `**今日 ${fmtDate(data.daily.time[0])}** — ${dayInfo.emoji} ${dayInfo.label}\n` +
-        `最高 ${data.daily.temperature_2m_max[0]}℃ / 最低 ${data.daily.temperature_2m_min[0]}℃ / 降水確率 ${data.daily.precipitation_probability_max[0] ?? 0}%`
-    );
+    const summary =
+      `### ${fmtDate(data.daily.time[0])} ${dayInfo.emoji} ${dayInfo.label}\n` +
+      `最高 **${data.daily.temperature_2m_max[0]}℃** / 最低 **${data.daily.temperature_2m_min[0]}℃** / 降水確率 **${data.daily.precipitation_probability_max[0] ?? 0}%**`;
 
     const now = new Date();
-    const lines: string[] = [];
+    const rows: string[] = [];
     for (let i = 0; i < data.hourly.time.length; i += 3) {
       const t = new Date(data.hourly.time[i]);
       if (t < now) continue;
       const w = wmo(data.hourly.weather_code[i]);
-      lines.push(
-        `${fmtHour(data.hourly.time[i])} ${w.emoji} ${data.hourly.temperature_2m[i]}℃ / 降水 ${data.hourly.precipitation_probability[i] ?? 0}%`
+      rows.push(
+        `${fmtHour(data.hourly.time[i])}  ${pad(w.emoji + " " + w.label, 14)}  ${pad(data.hourly.temperature_2m[i] + "℃", 6)}  ☔ ${data.hourly.precipitation_probability[i] ?? 0}%`
       );
-      if (lines.length >= 8) break;
+      if (rows.length >= 8) break;
     }
-    if (lines.length) {
-      embed.addFields({ name: "3時間ごと", value: lines.join("\n") });
-    }
-  } else {
-    const lines = data.daily.time.map((iso, i) => {
-      const w = wmo(data.daily.weather_code[i]);
-      return `**${fmtDate(iso)}** ${w.emoji} ${w.label}  ${data.daily.temperature_2m_max[i]}℃/${data.daily.temperature_2m_min[i]}℃  ☔${data.daily.precipitation_probability_max[i] ?? 0}%`;
-    });
-    embed.setDescription(lines.join("\n"));
+    const table = rows.length ? "```\n" + rows.join("\n") + "\n```" : "";
+
+    return [header, "", summary, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"]
+      .filter(Boolean)
+      .join("\n");
   }
 
-  embed.setFooter({ text: "Open-Meteo (Asia/Tokyo)" });
-  return embed;
+  const rows = data.daily.time.map((iso, i) => {
+    const w = wmo(data.daily.weather_code[i]);
+    const date = pad(fmtDate(iso), 10);
+    const cond = pad(w.emoji + " " + w.label, 14);
+    const temp = pad(`${data.daily.temperature_2m_max[i]}℃ / ${data.daily.temperature_2m_min[i]}℃`, 12);
+    return `${date}  ${cond}  ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`;
+  });
+  const table = "```\n" + rows.join("\n") + "\n```";
+
+  return [header, "", table, "-# 出典: Open-Meteo (Asia/Tokyo)"].join("\n");
 }
 
 export function buildRangeButtons(

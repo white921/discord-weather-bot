@@ -14,7 +14,7 @@ import {
 } from "../data/regions.js";
 import { prisma } from "../db/client.js";
 import { fetchForecast } from "../weather/openMeteo.js";
-import { buildForecastEmbed, buildRangeButtons } from "../weather/formatter.js";
+import { buildForecastText, buildRangeButtons } from "../weather/formatter.js";
 
 export type FlowMode = "view" | "favorite";
 
@@ -149,8 +149,8 @@ async function finalize(
   try {
     const data = await fetchForecast(region.lat, region.lon, "3day");
     await interaction.editReply({
-      content: "",
-      embeds: [buildForecastEmbed(region, "3day", data)],
+      content: buildForecastText(region, "3day", data),
+      embeds: [],
       components: [buildRangeButtons(region.id, "3day")],
     });
   } catch (e) {
