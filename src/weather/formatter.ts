@@ -3,7 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from "discord.js";
-import type { Subdivision } from "../data/regions.js";
+import type { SubdivisionWithPref } from "../data/regions.js";
 import type { ForecastRange, OpenMeteoResponse } from "./openMeteo.js";
 
 const WMO: Record<number, { label: string; emoji: string }> = {
@@ -57,11 +57,13 @@ function pad(s: string | number, width: number): string {
 }
 
 export function buildForecastText(
-  sub: Subdivision,
+  sub: SubdivisionWithPref,
   range: ForecastRange,
   data: OpenMeteoResponse
 ): string {
-  const header = `## 🌤️ ${sub.name} の天気予報`;
+  const title =
+    sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`;
+  const header = `## 🌤️ ${title} の天気予報`;
 
   if (range === "today" && data.hourly) {
     const dayInfo = wmo(data.daily.weather_code[0]);

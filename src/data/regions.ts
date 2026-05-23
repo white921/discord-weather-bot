@@ -303,11 +303,15 @@ export const AREAS: Area[] = [
   },
 ];
 
-export const ALL_SUBDIVISIONS: Subdivision[] = AREAS.flatMap((a) =>
-  a.prefectures.flatMap((p) => p.subdivisions)
+export type SubdivisionWithPref = Subdivision & { prefName: string; prefId: string };
+
+export const ALL_SUBDIVISIONS: SubdivisionWithPref[] = AREAS.flatMap((a) =>
+  a.prefectures.flatMap((p) =>
+    p.subdivisions.map((s) => ({ ...s, prefName: p.name, prefId: p.id }))
+  )
 );
 
-export function findSubdivision(id: string): Subdivision | undefined {
+export function findSubdivision(id: string): SubdivisionWithPref | undefined {
   return ALL_SUBDIVISIONS.find((s) => s.id === id);
 }
 
