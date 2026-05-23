@@ -24,12 +24,20 @@ export function startScheduler(client: Client) {
     const targets = await prisma.notifySchedule.findMany({
       where: { enabled: true, hour, minute },
     });
+    if (targets.length > 0) {
+      console.log(
+        `[notify] ${hour}:${minute} JST — ${targets.length} target(s): ${targets
+          .map((t) => t.userId)
+          .join(", ")}`
+      );
+    }
     for (const t of targets) {
       try {
         const fav = await prisma.userFavorite.findUnique({
           where: { userId: t.userId },
         });
         if (!fav) {
+          console.log(`[notify] ${t.userId}: no favorite, disabling`);
           await prisma.notifySchedule.update({
             where: { userId: t.userId },
             data: { enabled: false },
@@ -37,10 +45,17 @@ export function startScheduler(client: Client) {
           continue;
         }
         const region = findSubdivision(fav.subdivisionId);
-        if (!region) continue;
+        if (!region) {
+          console.log(
+            `[notify] ${t.userId}: region not found (subdivisionId=${fav.subdivisionId})`
+          );
+          continue;
+        }
+        console.log(`[notify] ${t.userId}: fetching forecast for ${region.name}`);
         const data = await fetchForecast(region.lat, region.lon, "3day");
         const user = await client.users.fetch(t.userId);
         await user.send({ embeds: [buildForecastEmbed(region, "3day", data)] });
+        console.log(`[notify] ${t.userId}: sent`);
         await prisma.notifySchedule.update({
           where: { userId: t.userId },
           data: { lastSentAt: new Date() },
