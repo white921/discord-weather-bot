@@ -96,17 +96,17 @@ export function buildForecastText(
       const dayStr = dayIso.slice(0, 10);
       const am = aggregateHalfDay(data.hourly, dayStr, 0, 11);
       const pm = aggregateHalfDay(data.hourly, dayStr, 12, 23);
-      const date = pad(fmtDate(dayIso), 10);
+      rows.push(`[ ${fmtDate(dayIso)} ]`);
       if (am) {
         const w = wmo(am.code);
         rows.push(
-          `${date}  午前  ${pad(w.emoji + " " + w.label, 14)}  ${pad(am.maxTemp + "°C", 6)}  ☔ ${am.maxPrecip}%`
+          `  午前  ${pad(w.emoji + " " + w.label, 14)}  ${pad(am.maxTemp + "°C", 6)}  ☔ ${am.maxPrecip}%`
         );
       }
       if (pm) {
         const w = wmo(pm.code);
         rows.push(
-          `${pad("", 10)}  午後  ${pad(w.emoji + " " + w.label, 14)}  ${pad(pm.maxTemp + "°C", 6)}  ☔ ${pm.maxPrecip}%`
+          `  午後  ${pad(w.emoji + " " + w.label, 14)}  ${pad(pm.maxTemp + "°C", 6)}  ☔ ${pm.maxPrecip}%`
         );
       }
       if (d < data.daily.time.length - 1) rows.push("");
