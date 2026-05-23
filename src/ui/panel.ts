@@ -13,6 +13,7 @@ export function buildPanelMessage() {
         "🔍 地域を選んで天気を見る\n" +
         "⭐ お気に入りの天気をワンタップで表示\n" +
         "📝 お気に入りを登録／変更\n" +
+        "🗑️ お気に入りを削除\n" +
         "🔔 毎朝 DM で予報を受け取る\n" +
         "🔕 通知を停止"
     )
@@ -33,7 +34,12 @@ export function buildPanelMessage() {
       .setCustomId("panel:fav-set")
       .setLabel("お気に入りを登録/変更")
       .setEmoji("📝")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId("panel:fav-clear")
+      .setLabel("お気に入りを削除")
+      .setEmoji("🗑️")
+      .setStyle(ButtonStyle.Danger)
   );
 
   const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(

@@ -10,19 +10,34 @@ import { prisma } from "../db/client.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
 import { buildForecastEmbed, buildRangeButtons } from "../weather/formatter.js";
-import { buildAreaSelect } from "./regionSelect.js";
+import { buildAreaButtons } from "./regionSelect.js";
 
 export async function handlePanelButton(interaction: ButtonInteraction) {
   const action = interaction.customId.split(":")[1];
   const userId = interaction.user.id;
 
   if (action === "view") {
-    await interaction.reply(buildAreaSelect("view"));
+    await interaction.reply(buildAreaButtons("view"));
     return;
   }
 
   if (action === "fav-set") {
-    await interaction.reply(buildAreaSelect("favorite"));
+    await interaction.reply(buildAreaButtons("favorite"));
+    return;
+  }
+
+  if (action === "fav-clear") {
+    const favDeleted = await prisma.userFavorite.deleteMany({ where: { userId } });
+    const notifyDeleted = await prisma.notifySchedule.deleteMany({ where: { userId } });
+    await interaction.reply({
+      content:
+        favDeleted.count > 0
+          ? notifyDeleted.count > 0
+            ? "🗑️ お気に入りを削除しました（DM 通知も停止しました）。"
+            : "🗑️ お気に入りを削除しました。"
+          : "お気に入りは登録されていませんでした。",
+      flags: MessageFlags.Ephemeral,
+    });
     return;
   }
 

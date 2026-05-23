@@ -1,8 +1,9 @@
 import {
   ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   MessageFlags,
-  StringSelectMenuBuilder,
-  StringSelectMenuInteraction,
   type InteractionReplyOptions,
 } from "discord.js";
 import {
@@ -17,59 +18,79 @@ import { buildForecastEmbed, buildRangeButtons } from "../weather/formatter.js";
 
 export type FlowMode = "view" | "favorite";
 
-export function buildAreaSelect(mode: FlowMode): InteractionReplyOptions {
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(`region:area:${mode}`)
-    .setPlaceholder("地方を選択")
-    .addOptions(AREAS.map((a) => ({ label: a.name, value: a.id })));
+function chunk<T>(arr: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+function buttonsToRows(buttons: ButtonBuilder[]): ActionRowBuilder<ButtonBuilder>[] {
+  return chunk(buttons, 5).map((row) =>
+    new ActionRowBuilder<ButtonBuilder>().addComponents(...row)
+  );
+}
+
+export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
+  const buttons = AREAS.map((a) =>
+    new ButtonBuilder()
+      .setCustomId(`region:area:${mode}:${a.id}`)
+      .setLabel(a.name)
+      .setStyle(ButtonStyle.Secondary)
+  );
   return {
-    content: mode === "favorite" ? "お気に入り登録: 地方を選んでください。" : "地方を選んでください。",
-    components: [new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu)],
+    content:
+      mode === "favorite"
+        ? "お気に入り登録: 地方を選んでください。"
+        : "地方を選んでください。",
+    components: buttonsToRows(buttons),
     flags: MessageFlags.Ephemeral,
   };
 }
 
-function buildPrefSelect(mode: FlowMode, areaId: string) {
+function buildPrefRows(mode: FlowMode, areaId: string) {
   const area = findArea(areaId);
   if (!area) return null;
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(`region:pref:${mode}`)
-    .setPlaceholder("都道府県を選択")
-    .addOptions(
-      area.prefectures.slice(0, 25).map((p) => ({ label: p.name, value: p.id }))
-    );
-  return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+  const buttons = area.prefectures.map((p) =>
+    new ButtonBuilder()
+      .setCustomId(`region:pref:${mode}:${p.id}`)
+      .setLabel(p.name)
+      .setStyle(ButtonStyle.Secondary)
+  );
+  return buttonsToRows(buttons);
 }
 
-function buildSubSelect(mode: FlowMode, prefId: string) {
+function buildSubRows(mode: FlowMode, prefId: string) {
   const pref = findPrefecture(prefId);
   if (!pref) return null;
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(`region:sub:${mode}`)
-    .setPlaceholder("地域を選択")
-    .addOptions(
-      pref.subdivisions.map((s) => ({ label: s.name, value: s.id }))
-    );
-  return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+  const buttons = pref.subdivisions.map((s) =>
+    new ButtonBuilder()
+      .setCustomId(`region:sub:${mode}:${s.id}`)
+      .setLabel(s.name)
+      .setStyle(ButtonStyle.Secondary)
+  );
+  return buttonsToRows(buttons);
 }
 
-export async function handleRegionSelect(interaction: StringSelectMenuInteraction) {
-  const [, step, mode] = interaction.customId.split(":") as [
+export async function handleRegionButton(interaction: ButtonInteraction) {
+  const [, step, mode, value] = interaction.customId.split(":") as [
     "region",
     "area" | "pref" | "sub",
     FlowMode,
+    string,
   ];
-  const value = interaction.values[0];
 
   if (step === "area") {
-    const row = buildPrefSelect(mode, value);
-    if (!row) {
+    const rows = buildPrefRows(mode, value);
+    if (!rows) {
       await interaction.update({ content: "地方が見つかりません。", components: [] });
       return;
     }
     await interaction.update({
-      content: mode === "favorite" ? "お気に入り登録: 都道府県を選んでください。" : "都道府県を選んでください。",
-      components: [row],
+      content:
+        mode === "favorite"
+          ? "お気に入り登録: 都道府県を選んでください。"
+          : "都道府県を選んでください。",
+      components: rows,
     });
     return;
   }
@@ -84,10 +105,13 @@ export async function handleRegionSelect(interaction: StringSelectMenuInteractio
       await finalize(interaction, mode, pref.subdivisions[0].id);
       return;
     }
-    const row = buildSubSelect(mode, value)!;
+    const rows = buildSubRows(mode, value)!;
     await interaction.update({
-      content: mode === "favorite" ? "お気に入り登録: 地域を選んでください。" : "地域を選んでください。",
-      components: [row],
+      content:
+        mode === "favorite"
+          ? "お気に入り登録: 地域を選んでください。"
+          : "地域を選んでください。",
+      components: rows,
     });
     return;
   }
@@ -98,7 +122,7 @@ export async function handleRegionSelect(interaction: StringSelectMenuInteractio
 }
 
 async function finalize(
-  interaction: StringSelectMenuInteraction,
+  interaction: ButtonInteraction,
   mode: FlowMode,
   subdivisionId: string
 ) {

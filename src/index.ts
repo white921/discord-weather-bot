@@ -2,7 +2,7 @@ import { Client, Events, GatewayIntentBits, Interaction, MessageFlags } from "di
 import { COMMANDS } from "./commands/index.js";
 import { registerSlashCommands } from "./registerCommands.js";
 import { handlePanelButton } from "./interactions/panelButtons.js";
-import { handleRegionSelect } from "./interactions/regionSelect.js";
+import { handleRegionButton } from "./interactions/regionSelect.js";
 import { handleRangeButton } from "./interactions/forecastRange.js";
 import { handleNotifyModal } from "./interactions/notifyModal.js";
 import { startScheduler } from "./scheduler/dailyNotify.js";
@@ -38,14 +38,10 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
     if (interaction.isButton()) {
       if (interaction.customId.startsWith("panel:")) {
         await handlePanelButton(interaction);
+      } else if (interaction.customId.startsWith("region:")) {
+        await handleRegionButton(interaction);
       } else if (interaction.customId.startsWith("range:")) {
         await handleRangeButton(interaction);
-      }
-      return;
-    }
-    if (interaction.isStringSelectMenu()) {
-      if (interaction.customId.startsWith("region:")) {
-        await handleRegionSelect(interaction);
       }
       return;
     }
