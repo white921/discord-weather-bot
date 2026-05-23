@@ -73,14 +73,16 @@ export function buildForecastText(
 
     const now = new Date();
     const rows: string[] = [];
-    for (let i = 0; i < data.hourly.time.length; i++) {
-      const t = new Date(data.hourly.time[i]);
-      if (t < now) continue;
+    // Find first future hourly index, then step every 3 hours for 8 rows (24h window).
+    let start = data.hourly.time.findIndex((iso) => new Date(iso) >= now);
+    if (start < 0) start = 0;
+    for (let k = 0; k < 8; k++) {
+      const i = start + k * 3;
+      if (i >= data.hourly.time.length) break;
       const w = wmo(data.hourly.weather_code[i]);
       rows.push(
         `${fmtHour(data.hourly.time[i])}  ${pad(w.emoji + " " + w.label, 10)}  ${pad(data.hourly.temperature_2m[i] + "°C", 6)}  ☔ ${data.hourly.precipitation_probability[i] ?? 0}%`
       );
-      if (rows.length >= 24) break;
     }
     const table = rows.length ? "```\n" + rows.join("\n") + "\n```" : "";
 

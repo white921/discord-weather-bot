@@ -32,7 +32,8 @@ export async function fetchForecast(
   range: ForecastRange,
   timezone: string = "Asia/Tokyo"
 ): Promise<OpenMeteoResponse> {
-  const days = range === "today" ? 1 : range === "3day" ? 3 : 7;
+  // For "today" we want a 24h rolling hourly window, so fetch 2 days of hourly data.
+  const days = range === "today" ? 2 : range === "3day" ? 3 : 7;
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
