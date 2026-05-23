@@ -119,9 +119,9 @@ export function buildForecastText(
   for (let i = 0; i < data.daily.time.length; i++) {
     const w = wmo(data.daily.weather_code[i]);
     rows.push(`[ ${fmtDate(data.daily.time[i])} ]`);
-    const cond = pad(w.emoji + " " + w.label, 10);
+    const cond = pad(w.emoji + " " + w.label, 8);
     const temp = pad(`${data.daily.temperature_2m_max[i]}°C / ${data.daily.temperature_2m_min[i]}°C`, 12);
-    rows.push(`  ${cond}  ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`);
+    rows.push(`${cond} ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`);
     if (i < data.daily.time.length - 1) rows.push("");
   }
   const table = "```\n" + rows.join("\n") + "\n```";
