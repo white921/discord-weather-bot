@@ -9,7 +9,7 @@ import {
 import { prisma } from "../db/client.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
-import { buildForecastText, buildRangeButtons } from "../weather/formatter.js";
+import { buildForecastText, buildRangeButtons, buildExternalLinks } from "../weather/formatter.js";
 import { buildAreaButtons } from "./regionSelect.js";
 
 export async function handlePanelButton(interaction: ButtonInteraction) {
@@ -64,7 +64,7 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
       await interaction.editReply({
         content: buildForecastText(region, "today", data),
         embeds: [],
-        components: [buildRangeButtons(region.id, "today")],
+        components: [buildRangeButtons(region.id, "today"), buildExternalLinks(region)],
       });
     } catch (e) {
       await interaction.editReply({

@@ -198,3 +198,51 @@ export function buildRangeButtons(
     mk("7day", "7日間")
   );
 }
+
+// External weather-service link buttons. Domestic regions get Yahoo / tenki.jp
+// (search by name) plus Weathernews (lat/lon onebox). International regions
+// get Weathernews + Weather.com (both keyed on lat/lon).
+export function buildExternalLinks(
+  sub: SubdivisionWithPref
+): ActionRowBuilder<ButtonBuilder> {
+  const isIntl = sub.id.startsWith("intl-");
+  const wn = `https://weathernews.jp/onebox/${sub.lat}/${sub.lon}/`;
+
+  const row = new ActionRowBuilder<ButtonBuilder>();
+  if (isIntl) {
+    const query = encodeURIComponent(`${sub.prefName} ${sub.name}`);
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel("Weathernews")
+        .setStyle(ButtonStyle.Link)
+        .setURL(wn),
+      new ButtonBuilder()
+        .setLabel("Weather.com")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://weather.com/weather/today/l/${sub.lat},${sub.lon}`),
+      new ButtonBuilder()
+        .setLabel("Google")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://www.google.com/search?q=${query}+weather`)
+    );
+  } else {
+    const q = encodeURIComponent(
+      sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`
+    );
+    row.addComponents(
+      new ButtonBuilder()
+        .setLabel("Yahoo天気")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://weather.yahoo.co.jp/weather/search/?p=${q}`),
+      new ButtonBuilder()
+        .setLabel("tenki.jp")
+        .setStyle(ButtonStyle.Link)
+        .setURL(`https://tenki.jp/search/?keyword=${q}`),
+      new ButtonBuilder()
+        .setLabel("Weathernews")
+        .setStyle(ButtonStyle.Link)
+        .setURL(wn)
+    );
+  }
+  return row;
+}
