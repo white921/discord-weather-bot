@@ -199,9 +199,23 @@ export function buildRangeButtons(
   );
 }
 
+// JIS 2-digit prefecture codes used by Yahoo 天気 URLs.
+const YAHOO_JIS: Record<string, string> = {
+  hokkaido: "01", aomori: "02", iwate: "03", miyagi: "04", akita: "05",
+  yamagata: "06", fukushima: "07", ibaraki: "08", tochigi: "09", gunma: "10",
+  saitama: "11", chiba: "12", tokyo: "13", kanagawa: "14", niigata: "15",
+  toyama: "16", ishikawa: "17", fukui: "18", yamanashi: "19", nagano: "20",
+  gifu: "21", shizuoka: "22", aichi: "23", mie: "24", shiga: "25",
+  kyoto: "26", osaka: "27", hyogo: "28", nara: "29", wakayama: "30",
+  tottori: "31", shimane: "32", okayama: "33", hiroshima: "34", yamaguchi: "35",
+  tokushima: "36", kagawa: "37", ehime: "38", kochi: "39", fukuoka: "40",
+  saga: "41", nagasaki: "42", kumamoto: "43", oita: "44", miyazaki: "45",
+  kagoshima: "46", okinawa: "47",
+};
+
 // External weather-service link buttons. Domestic regions get Yahoo / tenki.jp
-// (search by name) plus Weathernews (lat/lon onebox). International regions
-// get Weathernews + Weather.com (both keyed on lat/lon).
+// (prefecture page) plus Weathernews (lat/lon onebox). International regions
+// get Weathernews + Weather.com (lat/lon) + Google search fallback.
 export function buildExternalLinks(
   sub: SubdivisionWithPref
 ): ActionRowBuilder<ButtonBuilder> {
@@ -226,6 +240,8 @@ export function buildExternalLinks(
         .setURL(`https://www.google.com/search?q=${query}+weather`)
     );
   } else {
+    const jis = YAHOO_JIS[sub.prefId] ?? "13";
+    const yahooUrl = `https://weather.yahoo.co.jp/weather/jp/${jis}/`;
     const q = encodeURIComponent(
       sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`
     );
@@ -233,7 +249,7 @@ export function buildExternalLinks(
       new ButtonBuilder()
         .setLabel("Yahoo天気")
         .setStyle(ButtonStyle.Link)
-        .setURL(`https://weather.yahoo.co.jp/weather/search/?p=${q}`),
+        .setURL(yahooUrl),
       new ButtonBuilder()
         .setLabel("tenki.jp")
         .setStyle(ButtonStyle.Link)
