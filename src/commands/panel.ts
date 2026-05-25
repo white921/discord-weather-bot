@@ -1,7 +1,6 @@
 import {
   ChatInputCommandInteraction,
   MessageFlags,
-  PermissionFlagsBits,
   SlashCommandBuilder,
 } from "discord.js";
 import { buildPanelMessage } from "../ui/panel.js";
@@ -9,7 +8,6 @@ import { buildPanelMessage } from "../ui/panel.js";
 export const data = new SlashCommandBuilder()
   .setName("panel")
   .setDescription("天気予報パネルをこのチャンネルに設置します")
-  .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
   .setDMPermission(false);
 
 export async function execute(interaction: ChatInputCommandInteraction) {

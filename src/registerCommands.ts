@@ -10,6 +10,14 @@ export async function registerSlashCommands(opts: {
   const rest = new REST({ version: "10" }).setToken(opts.token);
 
   if (opts.guildIds && opts.guildIds.length > 0) {
+    // Clear stale global commands so users don't see duplicates alongside the
+    // per-guild registrations.
+    try {
+      await rest.put(Routes.applicationCommands(opts.clientId), { body: [] });
+      console.log("[commands] cleared global commands");
+    } catch (e) {
+      console.error("[commands] failed to clear global commands:", e);
+    }
     for (const guildId of opts.guildIds) {
       await rest.put(
         Routes.applicationGuildCommands(opts.clientId, guildId),
