@@ -12,7 +12,7 @@ import {
   findPrefecture,
   findSubdivision,
 } from "../data/regions.js";
-import { prisma } from "../db/client.js";
+import { upsertFavoriteSubdivisionId } from "../db/favorites.js";
 import { fetchForecast } from "../weather/openMeteo.js";
 import { buildForecastText, buildRangeButtons, buildExternalLinks } from "../weather/formatter.js";
 
@@ -147,11 +147,7 @@ async function finalize(
   }
 
   if (mode === "favorite") {
-    await prisma.userFavorite.upsert({
-      where: { userId: interaction.user.id },
-      update: { subdivisionId },
-      create: { userId: interaction.user.id, subdivisionId },
-    });
+    await upsertFavoriteSubdivisionId(interaction.user.id, subdivisionId);
     await interaction.update({
       content: `⭐ お気に入りを **${region.name}** に設定しました。`,
       components: [],

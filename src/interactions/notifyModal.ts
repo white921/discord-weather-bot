@@ -1,5 +1,6 @@
 import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import { prisma } from "../db/client.js";
+import { getFavoriteSubdivisionId } from "../db/favorites.js";
 
 const TIME_RE = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -17,8 +18,8 @@ export async function handleNotifyModal(interaction: ModalSubmitInteraction) {
   const minute = Number(m[2]);
   const userId = interaction.user.id;
 
-  const fav = await prisma.userFavorite.findUnique({ where: { userId } });
-  if (!fav) {
+  const favSubId = await getFavoriteSubdivisionId(userId);
+  if (!favSubId) {
     await interaction.reply({
       content: "お気に入りが未登録です。先に登録してください。",
       flags: MessageFlags.Ephemeral,

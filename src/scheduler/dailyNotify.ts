@@ -1,6 +1,7 @@
 import { Client } from "discord.js";
 import cron from "node-cron";
 import { prisma } from "../db/client.js";
+import { getFavoriteSubdivisionId } from "../db/favorites.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
 import { buildForecastText, buildRangeButtons, buildExternalLinks } from "../weather/formatter.js";
@@ -33,10 +34,8 @@ export function startScheduler(client: Client) {
     }
     for (const t of targets) {
       try {
-        const fav = await prisma.userFavorite.findUnique({
-          where: { userId: t.userId },
-        });
-        if (!fav) {
+        const favSubId = await getFavoriteSubdivisionId(t.userId);
+        if (!favSubId) {
           console.log(`[notify] ${t.userId}: no favorite, disabling`);
           await prisma.notifySchedule.update({
             where: { userId: t.userId },
@@ -44,10 +43,10 @@ export function startScheduler(client: Client) {
           });
           continue;
         }
-        const region = findSubdivision(fav.subdivisionId);
+        const region = findSubdivision(favSubId);
         if (!region) {
           console.log(
-            `[notify] ${t.userId}: region not found (subdivisionId=${fav.subdivisionId})`
+            `[notify] ${t.userId}: region not found (subdivisionId=${favSubId})`
           );
           continue;
         }
