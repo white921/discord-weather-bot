@@ -213,9 +213,9 @@ const YAHOO_JIS: Record<string, string> = {
   kagoshima: "46", okinawa: "47",
 };
 
-// External weather-service link buttons. Domestic regions get Yahoo / tenki.jp
-// (prefecture page) plus Weathernews (lat/lon onebox). International regions
-// get Weathernews + Weather.com (lat/lon) + Google search fallback.
+// External weather-service link buttons. Domestic regions get Yahoo +
+// Weathernews (lat/lon onebox). International regions get Weathernews +
+// Weather.com (lat/lon) + Google search fallback.
 export function buildExternalLinks(
   sub: SubdivisionWithPref
 ): ActionRowBuilder<ButtonBuilder> {
@@ -242,18 +242,11 @@ export function buildExternalLinks(
   } else {
     const jis = YAHOO_JIS[sub.prefId] ?? "13";
     const yahooUrl = `https://weather.yahoo.co.jp/weather/jp/${jis}/`;
-    const q = encodeURIComponent(
-      sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`
-    );
     row.addComponents(
       new ButtonBuilder()
         .setLabel("Yahoo天気")
         .setStyle(ButtonStyle.Link)
         .setURL(yahooUrl),
-      new ButtonBuilder()
-        .setLabel("tenki.jp")
-        .setStyle(ButtonStyle.Link)
-        .setURL(`https://tenki.jp/search/?keyword=${q}`),
       new ButtonBuilder()
         .setLabel("Weathernews")
         .setStyle(ButtonStyle.Link)
