@@ -7,6 +7,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { prisma } from "../db/client.js";
+import { deleteFavorite, getFavoriteSubdivisionId } from "../db/favorites.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
 import { buildForecastText, buildRangeButtons, buildExternalLinks } from "../weather/formatter.js";
@@ -27,11 +28,11 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
   }
 
   if (action === "fav-clear") {
-    const favDeleted = await prisma.userFavorite.deleteMany({ where: { userId } });
+    const favDeleted = await deleteFavorite(userId);
     const notifyDeleted = await prisma.notifySchedule.deleteMany({ where: { userId } });
     await interaction.reply({
       content:
-        favDeleted.count > 0
+        favDeleted > 0
           ? notifyDeleted.count > 0
             ? "🗑️ お気に入りを削除しました（DM 通知も停止しました）。"
             : "🗑️ お気に入りを削除しました。"
@@ -42,15 +43,15 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
   }
 
   if (action === "fav-show") {
-    const fav = await prisma.userFavorite.findUnique({ where: { userId } });
-    if (!fav) {
+    const favSubId = await getFavoriteSubdivisionId(userId);
+    if (!favSubId) {
       await interaction.reply({
         content: "⭐ お気に入りが未登録です。「📝 お気に入りを登録/変更」から設定してください。",
         flags: MessageFlags.Ephemeral,
       });
       return;
     }
-    const region = findSubdivision(fav.subdivisionId);
+    const region = findSubdivision(favSubId);
     if (!region) {
       await interaction.reply({
         content: "登録地域が見つかりません。再登録してください。",
@@ -75,8 +76,8 @@ export async function handlePanelButton(interaction: ButtonInteraction) {
   }
 
   if (action === "notify-on") {
-    const fav = await prisma.userFavorite.findUnique({ where: { userId } });
-    if (!fav) {
+    const favSubId = await getFavoriteSubdivisionId(userId);
+    if (!favSubId) {
       await interaction.reply({
         content: "🔔 DM 通知はお気に入り地域に対して送信します。先に「📝 お気に入りを登録/変更」してください。",
         flags: MessageFlags.Ephemeral,

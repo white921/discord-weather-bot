@@ -9,7 +9,7 @@ datasource db {
 
 model UserFavorite {
   userId        String   @id @db.VarChar(32)
-  subdivisionId String   @db.VarChar(64)
+  subdivisionId String   @db.VarChar(255)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

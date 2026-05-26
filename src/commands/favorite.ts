@@ -4,6 +4,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { prisma } from "../db/client.js";
+import { getFavoriteSubdivisionId } from "../db/favorites.js";
 import { findSubdivision } from "../data/regions.js";
 import { fetchForecast } from "../weather/openMeteo.js";
 import { buildForecastText, buildRangeButtons, buildExternalLinks } from "../weather/formatter.js";
@@ -28,15 +29,15 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     return;
   }
 
-  const fav = await prisma.userFavorite.findUnique({ where: { userId } });
-  if (!fav) {
+  const favSubId = await getFavoriteSubdivisionId(userId);
+  if (!favSubId) {
     await interaction.reply({
       content: "お気に入りが未登録です。パネルから登録してください。",
       flags: MessageFlags.Ephemeral,
     });
     return;
   }
-  const region = findSubdivision(fav.subdivisionId);
+  const region = findSubdivision(favSubId);
   if (!region) {
     await interaction.reply({
       content: "登録地域が見つかりません。再登録してください。",
