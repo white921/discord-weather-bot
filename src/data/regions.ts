@@ -81,16 +81,27 @@ export const AREAS: Area[] = [
     name: "関東",
     prefectures: [
       { id: "ibaraki", name: "茨城県", subdivisions: [
-        { id: "ibaraki-north", name: "北部", lat: 36.7397, lon: 140.4467 },
-        { id: "ibaraki-south", name: "南部", lat: 36.3418, lon: 140.4468 },
+        { id: "ibaraki-kenpoku", name: "県北", lat: 36.6000, lon: 140.6500 },
+        { id: "ibaraki-keno", name: "県央", lat: 36.3700, lon: 140.4700 },
+        { id: "ibaraki-rokko", name: "鹿行", lat: 35.9600, lon: 140.6500 },
+        { id: "ibaraki-kennan", name: "県南", lat: 36.0833, lon: 140.1000 },
+        { id: "ibaraki-kensei", name: "県西", lat: 36.1800, lon: 139.7100 },
       ]},
       { id: "tochigi", name: "栃木県", subdivisions: [
-        { id: "tochigi-south", name: "南部", lat: 36.5658, lon: 139.8836 },
-        { id: "tochigi-north", name: "北部", lat: 36.9095, lon: 139.79 },
+        { id: "tochigi-utsunomiya", name: "宇都宮", lat: 36.5658, lon: 139.8836 },
+        { id: "tochigi-moka", name: "真岡", lat: 36.4408, lon: 140.0094 },
+        { id: "tochigi-otawara", name: "大田原・烏山", lat: 36.8709, lon: 140.0156 },
+        { id: "tochigi-nikko", name: "日光・鹿沼", lat: 36.7194, lon: 139.6228 },
+        { id: "tochigi-tochigi-city", name: "栃木", lat: 36.3815, lon: 139.7335 },
+        { id: "tochigi-sano-ashikaga", name: "佐野・足利", lat: 36.3145, lon: 139.4493 },
       ]},
       { id: "gunma", name: "群馬県", subdivisions: [
-        { id: "gunma-south", name: "南部", lat: 36.3911, lon: 139.0608 },
-        { id: "gunma-north", name: "北部", lat: 36.7833, lon: 138.85 },
+        { id: "gunma-maebashi", name: "前橋・伊勢崎", lat: 36.3911, lon: 139.0608 },
+        { id: "gunma-takasaki", name: "高崎・藤岡", lat: 36.3220, lon: 139.0030 },
+        { id: "gunma-kiryu", name: "桐生・太田・館林", lat: 36.3406, lon: 139.3791 },
+        { id: "gunma-shibukawa", name: "渋川", lat: 36.4894, lon: 139.0000 },
+        { id: "gunma-numata", name: "沼田", lat: 36.6457, lon: 139.0436 },
+        { id: "gunma-kusatsu", name: "草津・嬬恋・中之条", lat: 36.6219, lon: 138.5963 },
       ]},
       { id: "saitama", name: "埼玉県", subdivisions: [
         { id: "saitama-north", name: "北部", lat: 36.1473, lon: 139.3884 },
@@ -98,9 +109,12 @@ export const AREAS: Area[] = [
         { id: "saitama-chichibu", name: "秩父地方", lat: 35.9919, lon: 139.0844 },
       ]},
       { id: "chiba", name: "千葉県", subdivisions: [
-        { id: "chiba-north", name: "北西部", lat: 35.6047, lon: 140.1233 },
-        { id: "chiba-northeast", name: "北東部", lat: 35.7106, lon: 140.4666 },
-        { id: "chiba-south", name: "南部", lat: 35.0928, lon: 139.8682 },
+        { id: "chiba-northwest", name: "北西部", lat: 35.6047, lon: 140.1233 },
+        { id: "chiba-northeast", name: "北東部", lat: 35.7333, lon: 140.8267 },
+        { id: "chiba-inba", name: "印旛", lat: 35.7813, lon: 140.3175 },
+        { id: "chiba-kujukuri", name: "九十九里", lat: 35.4283, lon: 140.3122 },
+        { id: "chiba-minamiboso", name: "南部", lat: 35.2719, lon: 139.9551 },
+        { id: "chiba-awa", name: "安房", lat: 34.9959, lon: 139.8703 },
       ]},
       { id: "tokyo", name: "東京都", subdivisions: [
         { id: "tokyo-23-east", name: "23区東部", lat: 35.7100, lon: 139.8000 },
@@ -113,8 +127,12 @@ export const AREAS: Area[] = [
         { id: "tokyo-ogasawara", name: "小笠原諸島", lat: 27.0944, lon: 142.1919 },
       ]},
       { id: "kanagawa", name: "神奈川県", subdivisions: [
-        { id: "kanagawa-east", name: "東部", lat: 35.4478, lon: 139.6425 },
-        { id: "kanagawa-west", name: "西部", lat: 35.2647, lon: 139.1535 },
+        { id: "kanagawa-yokohama-kawasaki", name: "横浜・川崎", lat: 35.4478, lon: 139.6425 },
+        { id: "kanagawa-shonan", name: "湘南", lat: 35.3389, lon: 139.3434 },
+        { id: "kanagawa-miura", name: "三浦半島", lat: 35.2811, lon: 139.6717 },
+        { id: "kanagawa-kenoh", name: "県央", lat: 35.4400, lon: 139.3640 },
+        { id: "kanagawa-seisho", name: "西湘", lat: 35.2647, lon: 139.1535 },
+        { id: "kanagawa-kensei", name: "県西", lat: 35.2329, lon: 139.1056 },
       ]},
     ],
   },
@@ -160,8 +178,15 @@ export const AREAS: Area[] = [
         { id: "shizuoka-west", name: "西部", lat: 34.7108, lon: 137.7261 },
       ]},
       { id: "aichi", name: "愛知県", subdivisions: [
-        { id: "aichi-west", name: "西部", lat: 35.1815, lon: 136.9066 },
-        { id: "aichi-east", name: "東部", lat: 34.7693, lon: 137.3914 },
+        { id: "aichi-nagoya", name: "名古屋", lat: 35.1815, lon: 136.9066 },
+        { id: "aichi-owari-east", name: "尾張東部", lat: 35.2470, lon: 137.0130 },
+        { id: "aichi-owari-west", name: "尾張西部", lat: 35.3030, lon: 136.8040 },
+        { id: "aichi-owari-northwest", name: "尾張北西部", lat: 35.3500, lon: 136.8700 },
+        { id: "aichi-chita", name: "知多", lat: 34.8900, lon: 136.9100 },
+        { id: "aichi-mikawa-northwest", name: "西三河北西部", lat: 35.0830, lon: 137.1570 },
+        { id: "aichi-mikawa-south", name: "西三河南部", lat: 34.8900, lon: 137.0780 },
+        { id: "aichi-mikawa-east-north", name: "東三河北部", lat: 35.0000, lon: 137.5000 },
+        { id: "aichi-mikawa-east-south", name: "東三河南部", lat: 34.7693, lon: 137.3914 },
       ]},
     ],
   },
@@ -170,24 +195,41 @@ export const AREAS: Area[] = [
     name: "近畿",
     prefectures: [
       { id: "mie", name: "三重県", subdivisions: [
-        { id: "mie-north", name: "北中部", lat: 34.7303, lon: 136.5086 },
-        { id: "mie-south", name: "南部", lat: 33.7359, lon: 136.0094 },
+        { id: "mie-hokusei", name: "北勢", lat: 35.0000, lon: 136.6200 },
+        { id: "mie-chusei", name: "中勢", lat: 34.7303, lon: 136.5086 },
+        { id: "mie-iga", name: "伊賀", lat: 34.7700, lon: 136.1300 },
+        { id: "mie-nansei", name: "南勢", lat: 34.4900, lon: 136.7100 },
+        { id: "mie-higashi-kishu", name: "東紀州", lat: 33.9400, lon: 136.1900 },
       ]},
       { id: "shiga", name: "滋賀県", subdivisions: [
         { id: "shiga-south", name: "南部", lat: 35.0045, lon: 135.8686 },
         { id: "shiga-north", name: "北部", lat: 35.3623, lon: 136.2541 },
       ]},
       { id: "kyoto", name: "京都府", subdivisions: [
-        { id: "kyoto-south", name: "南部", lat: 35.0116, lon: 135.7681 },
-        { id: "kyoto-north", name: "北部", lat: 35.5396, lon: 135.1955 },
+        { id: "kyoto-city", name: "京都・亀岡", lat: 35.0116, lon: 135.7681 },
+        { id: "kyoto-yamashiro-central", name: "山城中部", lat: 34.8845, lon: 135.7997 },
+        { id: "kyoto-yamashiro-south", name: "山城南部", lat: 34.7378, lon: 135.8275 },
+        { id: "kyoto-nantan", name: "南丹", lat: 35.2107, lon: 135.4640 },
+        { id: "kyoto-maizuru", name: "舞鶴", lat: 35.4500, lon: 135.3856 },
+        { id: "kyoto-fukuchiyama", name: "福知山", lat: 35.2972, lon: 135.1267 },
+        { id: "kyoto-ayabe", name: "綾部", lat: 35.2989, lon: 135.2589 },
+        { id: "kyoto-tango", name: "丹後", lat: 35.6232, lon: 135.0640 },
       ]},
       { id: "osaka", name: "大阪府", subdivisions: [
-        { id: "osaka-north", name: "北部", lat: 34.7500, lon: 135.5000 },
-        { id: "osaka-south", name: "南部", lat: 34.4500, lon: 135.5500 },
+        { id: "osaka-city", name: "大阪市", lat: 34.6937, lon: 135.5023 },
+        { id: "osaka-kita", name: "北大阪", lat: 34.7800, lon: 135.5500 },
+        { id: "osaka-east", name: "東部大阪", lat: 34.6500, lon: 135.6100 },
+        { id: "osaka-minamikawachi", name: "南河内", lat: 34.5000, lon: 135.5900 },
+        { id: "osaka-senshu", name: "泉州", lat: 34.4500, lon: 135.3800 },
       ]},
       { id: "hyogo", name: "兵庫県", subdivisions: [
-        { id: "hyogo-south-east", name: "南部", lat: 34.6913, lon: 135.1830 },
-        { id: "hyogo-north", name: "北部", lat: 35.5417, lon: 134.8195 },
+        { id: "hyogo-hanshin", name: "阪神", lat: 34.6913, lon: 135.1830 },
+        { id: "hyogo-kitaharima-tanba", name: "北播丹波", lat: 35.0000, lon: 135.0600 },
+        { id: "hyogo-harima-northwest", name: "播磨北西部", lat: 35.0000, lon: 134.5500 },
+        { id: "hyogo-harima-southeast", name: "播磨南東部", lat: 34.7700, lon: 134.8200 },
+        { id: "hyogo-harima-southwest", name: "播磨南西部", lat: 34.8200, lon: 134.6800 },
+        { id: "hyogo-tajima", name: "但馬", lat: 35.5417, lon: 134.8195 },
+        { id: "hyogo-awaji", name: "淡路島", lat: 34.3600, lon: 134.8900 },
       ]},
       { id: "nara", name: "奈良県", subdivisions: [
         { id: "nara-north", name: "北部", lat: 34.6851, lon: 135.8048 },
@@ -213,12 +255,16 @@ export const AREAS: Area[] = [
         { id: "shimane-oki", name: "隠岐", lat: 36.1924, lon: 133.3289 },
       ]},
       { id: "okayama", name: "岡山県", subdivisions: [
-        { id: "okayama-south", name: "南部", lat: 34.6618, lon: 133.9344 },
-        { id: "okayama-north", name: "北部", lat: 35.0667, lon: 133.9167 },
+        { id: "okayama-southeast", name: "県南東部", lat: 34.6618, lon: 133.9344 },
+        { id: "okayama-southwest", name: "県南西部", lat: 34.5916, lon: 133.7700 },
+        { id: "okayama-northeast", name: "県北東部", lat: 35.0686, lon: 134.0042 },
+        { id: "okayama-northwest", name: "県北西部", lat: 34.9750, lon: 133.4700 },
       ]},
       { id: "hiroshima", name: "広島県", subdivisions: [
-        { id: "hiroshima-south", name: "南部", lat: 34.3853, lon: 132.4553 },
-        { id: "hiroshima-north", name: "北部", lat: 34.8048, lon: 132.9 },
+        { id: "hiroshima-aki", name: "安芸地方", lat: 34.3853, lon: 132.4553 },
+        { id: "hiroshima-bingo-south", name: "備後南部", lat: 34.4858, lon: 133.3622 },
+        { id: "hiroshima-geihoku", name: "芸北", lat: 34.6700, lon: 132.5000 },
+        { id: "hiroshima-bihoku", name: "備北", lat: 34.8048, lon: 132.8500 },
       ]},
       { id: "yamaguchi", name: "山口県", subdivisions: [
         { id: "yamaguchi-west", name: "西部", lat: 34.0658, lon: 131.0089 },
@@ -333,8 +379,41 @@ export const ALL_SUBDIVISIONS: SubdivisionWithPref[] = [
   ...INTL_SUBDIVISIONS,
 ];
 
+// Legacy subdivision IDs from before the 二次細分区域 expansion.
+// Kept as a runtime safety net so favorites or stale clients pointing at the
+// old 2-way splits still resolve to a sensible new region.
+export const LEGACY_SUBDIVISION_ID_MAP: Record<string, string> = {
+  "aichi-west": "aichi-nagoya",
+  "aichi-east": "aichi-mikawa-east-south",
+  "kanagawa-east": "kanagawa-yokohama-kawasaki",
+  "kanagawa-west": "kanagawa-seisho",
+  "osaka-north": "osaka-kita",
+  "osaka-south": "osaka-senshu",
+  "hyogo-south-east": "hyogo-hanshin",
+  "hyogo-north": "hyogo-tajima",
+  "kyoto-south": "kyoto-city",
+  "kyoto-north": "kyoto-maizuru",
+  "ibaraki-north": "ibaraki-kenpoku",
+  "ibaraki-south": "ibaraki-kennan",
+  "chiba-north": "chiba-northwest",
+  "gunma-south": "gunma-maebashi",
+  "gunma-north": "gunma-numata",
+  "tochigi-south": "tochigi-tochigi-city",
+  "tochigi-north": "tochigi-nikko",
+  "mie-north": "mie-hokusei",
+  "mie-south": "mie-nansei",
+  "okayama-south": "okayama-southeast",
+  "okayama-north": "okayama-northeast",
+  "hiroshima-south": "hiroshima-aki",
+  "hiroshima-north": "hiroshima-bihoku",
+};
+
 export function findSubdivision(id: string): SubdivisionWithPref | undefined {
-  return ALL_SUBDIVISIONS.find((s) => s.id === id);
+  const direct = ALL_SUBDIVISIONS.find((s) => s.id === id);
+  if (direct) return direct;
+  const remapped = LEGACY_SUBDIVISION_ID_MAP[id];
+  if (remapped) return ALL_SUBDIVISIONS.find((s) => s.id === remapped);
+  return undefined;
 }
 
 export function findArea(id: string): Area | undefined {

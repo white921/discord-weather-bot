@@ -10,7 +10,8 @@
     "deploy-commands": "tsx src/deploy-commands.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "migrate:encrypt-favorites": "tsx scripts/encryptFavorites.ts"
+    "migrate:encrypt-favorites": "tsx scripts/encryptFavorites.ts",
+    "migrate:subdivisions": "tsx scripts/migrateSubdivisions.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
