@@ -56,6 +56,10 @@ function fmtHour(iso: string): string {
   return iso.slice(11, 13) + ":00";
 }
 
+function fmtWind(ms: number): string {
+  return ms.toFixed(1);
+}
+
 // "Now" expressed in the location's timezone as a naive string
 // ("YYYY-MM-DDTHH:MM"), comparable lexicographically against Open-Meteo's
 // hourly.time entries (which are in the same TZ, also naive).
@@ -95,7 +99,7 @@ export function buildForecastText(
     const dayInfo = wmo(data.daily.weather_code[0]);
     const summary =
       `### ${fmtDate(data.daily.time[0])} ${dayInfo.emoji} ${dayInfo.label}\n` +
-      `最高 **${data.daily.temperature_2m_max[0]}°C** / 最低 **${data.daily.temperature_2m_min[0]}°C** / 降水確率 **${data.daily.precipitation_probability_max[0] ?? 0}%**`;
+      `最高 **${data.daily.temperature_2m_max[0]}°C** / 最低 **${data.daily.temperature_2m_min[0]}°C** / 降水確率 **${data.daily.precipitation_probability_max[0] ?? 0}%** / 💨 **${fmtWind(data.daily.wind_speed_10m_max[0])} m/s**`;
 
     const nowStr = nowInTz(data.timezone);
     const rows: string[] = [];
@@ -125,7 +129,7 @@ export function buildForecastText(
       const dayStr = dayIso.slice(0, 10);
       const am = aggregateHalfDay(data.hourly, dayStr, 0, 11);
       const pm = aggregateHalfDay(data.hourly, dayStr, 12, 23);
-      rows.push(`[ ${fmtDate(dayIso)} ]`);
+      rows.push(`[ ${fmtDate(dayIso)} ]  💨 ${fmtWind(data.daily.wind_speed_10m_max[d])} m/s`);
       if (am) {
         const w = wmo(am.code);
         rows.push(
@@ -150,7 +154,7 @@ export function buildForecastText(
     rows.push(`[ ${fmtDate(data.daily.time[i])} ]`);
     const cond = pad(w.emoji + " " + w.label, 8);
     const temp = pad(`${data.daily.temperature_2m_max[i]}°C / ${data.daily.temperature_2m_min[i]}°C`, 12);
-    rows.push(`${cond} ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%`);
+    rows.push(`${cond} ${temp}  ☔ ${data.daily.precipitation_probability_max[i] ?? 0}%  💨 ${fmtWind(data.daily.wind_speed_10m_max[i])} m/s`);
     if (i < data.daily.time.length - 1) rows.push("");
   }
   const table = "```\n" + rows.join("\n") + "\n```";
@@ -192,11 +196,101 @@ export function buildRangeButtons(
       .setLabel(label)
       .setStyle(id === current ? ButtonStyle.Primary : ButtonStyle.Secondary)
       .setDisabled(id === current);
-  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     mk("today", "今日"),
     mk("3day", "3日間"),
     mk("7day", "7日間")
   );
+  if (current === "today") {
+    row.addComponents(buildOutfitButton(subId));
+  }
+  return row;
+}
+
+export function buildOutfitButton(subId: string): ButtonBuilder {
+  return new ButtonBuilder()
+    .setCustomId(`outfit:${subId}`)
+    .setLabel("おすすめの服装")
+    .setEmoji("👕")
+    .setStyle(ButtonStyle.Secondary);
+}
+
+// Decide which daily index to suggest for: 20:00 JST 以降は翌日。
+function pickOutfitDayIndex(data: OpenMeteoResponse): number {
+  const hour = Number(nowInTz(data.timezone).slice(11, 13));
+  if (hour >= 20 && data.daily.time.length >= 2) return 1;
+  return 0;
+}
+
+function clothingByTemp(tmax: number): string {
+  if (tmax >= 30) return "半袖・通気性のよい素材で。";
+  if (tmax >= 26) return "半袖一枚で快適。";
+  if (tmax >= 22) return "長袖シャツ、または半袖＋薄手の羽織もの。";
+  if (tmax >= 18) return "長袖＋薄手のカーディガン/ジャケット。";
+  if (tmax >= 14) return "ジャケットや薄手のニット。";
+  if (tmax >= 10) return "コートまたは厚手のアウター。";
+  if (tmax >= 6) return "冬物コート＋マフラーで防寒。";
+  return "ダウン＋手袋・耳あてでしっかり防寒。";
+}
+
+const RAIN_CODES = new Set([51, 53, 55, 61, 63, 65, 80, 81, 82]);
+const SNOW_CODES = new Set([71, 73, 75, 85, 86]);
+const THUNDER_CODES = new Set([95, 96, 99]);
+
+export function buildOutfitSuggestion(
+  sub: SubdivisionWithPref,
+  data: OpenMeteoResponse
+): string {
+  const i = pickOutfitDayIndex(data);
+  const dateLabel = fmtDate(data.daily.time[i]);
+  const tmax = data.daily.temperature_2m_max[i];
+  const tmin = data.daily.temperature_2m_min[i];
+  const code = data.daily.weather_code[i];
+  const pop = data.daily.precipitation_probability_max[i] ?? 0;
+  const wind = data.daily.wind_speed_10m_max[i] ?? 0;
+  const humidity = data.daily.relative_humidity_2m_max?.[i] ?? 0;
+  const uv = data.daily.uv_index_max?.[i] ?? 0;
+
+  const title =
+    sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`;
+  const w = wmo(code);
+
+  const tips: string[] = [];
+  tips.push(`・${clothingByTemp(tmax)}`);
+
+  if (tmax - tmin >= 8) {
+    tips.push("・朝晩との寒暖差が大きいので、脱ぎ着しやすい重ね着を。");
+  }
+  if (SNOW_CODES.has(code)) {
+    tips.push("・雪予報。滑りにくい靴・防水アウターで。路面凍結に注意。");
+  } else if (THUNDER_CODES.has(code)) {
+    tips.push("・雷雨の恐れ。屋外活動は控えめに、雨具を備えて。");
+  } else if (RAIN_CODES.has(code) || pop >= 50) {
+    tips.push(`・降水確率 ${pop}%。傘または撥水アウターを。`);
+  }
+  if (tmin <= 0 && !SNOW_CODES.has(code)) {
+    tips.push("・朝の冷え込み厳しめ。路面凍結の可能性に注意。");
+  }
+  if (wind >= 10) {
+    tips.push(`・強風 (最大 ${fmtWind(wind)} m/s)。傘破損や自転車に注意。`);
+  } else if (wind >= 7) {
+    tips.push(`・風が強め (最大 ${fmtWind(wind)} m/s)。帽子の飛ばされに注意。`);
+  }
+  if (tmax >= 30 || (tmax >= 28 && humidity >= 70)) {
+    tips.push("・熱中症注意。こまめな水分補給と日陰の利用を。");
+  }
+  if (uv >= 8) {
+    tips.push("・紫外線が非常に強い。日焼け止め・帽子・サングラスを。");
+  } else if (uv >= 6 && tmax >= 25) {
+    tips.push("・紫外線強め。日焼け対策を。");
+  }
+
+  const header = `## 👕 ${dateLabel} のおすすめ服装 — ${title}`;
+  const summary = `${w.emoji} ${w.label}  /  最高 **${tmax}°C** / 最低 **${tmin}°C**  /  ☔ ${pop}%  /  💨 ${fmtWind(wind)} m/s`;
+  const footer =
+    "-# ※ 体感には個人差があります。寒がりな方は1段階厚めを目安に。";
+
+  return [header, "", summary, "", tips.join("\n"), "", footer].join("\n");
 }
 
 // JIS 2-digit prefecture codes used by Yahoo 天気 URLs.

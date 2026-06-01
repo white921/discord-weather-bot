@@ -5,6 +5,7 @@ import { handlePanelButton } from "./interactions/panelButtons.js";
 import { handleRegionButton } from "./interactions/regionSelect.js";
 import { handleIntlButton } from "./interactions/internationalSelect.js";
 import { handleRangeButton } from "./interactions/forecastRange.js";
+import { handleOutfitButton } from "./interactions/outfitButton.js";
 import { handleNotifyModal } from "./interactions/notifyModal.js";
 import { startScheduler } from "./scheduler/dailyNotify.js";
 
@@ -66,6 +67,8 @@ client.on(Events.InteractionCreate, async (interaction: Interaction) => {
         await handleIntlButton(interaction);
       } else if (interaction.customId.startsWith("range:")) {
         await handleRangeButton(interaction);
+      } else if (interaction.customId.startsWith("outfit:")) {
+        await handleOutfitButton(interaction);
       }
       return;
     }

@@ -21,6 +21,9 @@ export type OpenMeteoResponse = {
     temperature_2m_max: number[];
     temperature_2m_min: number[];
     precipitation_probability_max: number[];
+    wind_speed_10m_max: number[];
+    relative_humidity_2m_max?: number[];
+    uv_index_max?: number[];
   };
 };
 
@@ -38,10 +41,11 @@ export async function fetchForecast(
     latitude: lat.toString(),
     longitude: lon.toString(),
     timezone,
+    wind_speed_unit: "ms",
     forecast_days: days.toString(),
     current: "temperature_2m,weather_code",
     daily:
-      "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+      "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,relative_humidity_2m_max,uv_index_max",
   });
   if (range === "today" || range === "3day") {
     params.set(
