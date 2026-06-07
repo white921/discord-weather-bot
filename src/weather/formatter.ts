@@ -222,15 +222,17 @@ function pickOutfitDayIndex(data: OpenMeteoResponse): number {
   return 0;
 }
 
-function clothingByTemp(tmax: number): string {
-  if (tmax >= 30) return "半袖・通気性のよい素材で。";
-  if (tmax >= 26) return "半袖一枚で快適。";
-  if (tmax >= 22) return "長袖シャツ、または半袖＋薄手の羽織もの。";
-  if (tmax >= 18) return "長袖＋薄手のカーディガン/ジャケット。";
-  if (tmax >= 14) return "ジャケットや薄手のニット。";
-  if (tmax >= 10) return "コートまたは厚手のアウター。";
-  if (tmax >= 6) return "冬物コート＋マフラーで防寒。";
-  return "ダウン＋手袋・耳あてでしっかり防寒。";
+// その日の最高気温に対応する服装イラストのファイル名。
+// 境界値は clothingByTemp 時代の区分を踏襲。assets/outfit/temperature-only/ 配下に同梱。
+export function outfitImageFile(tmax: number): string {
+  if (tmax >= 30) return "temp_30plus.png";
+  if (tmax >= 26) return "temp_26_29.png";
+  if (tmax >= 22) return "temp_22_25.png";
+  if (tmax >= 18) return "temp_18_21.png";
+  if (tmax >= 14) return "temp_14_17.png";
+  if (tmax >= 10) return "temp_10_13.png";
+  if (tmax >= 6) return "temp_6_9.png";
+  return "temp_under6.png";
 }
 
 const RAIN_CODES = new Set([51, 53, 55, 61, 63, 65, 80, 81, 82]);
@@ -240,7 +242,7 @@ const THUNDER_CODES = new Set([95, 96, 99]);
 export function buildOutfitSuggestion(
   sub: SubdivisionWithPref,
   data: OpenMeteoResponse
-): string {
+): { content: string; imageFile: string } {
   const i = pickOutfitDayIndex(data);
   const dateLabel = fmtDate(data.daily.time[i]);
   const tmax = data.daily.temperature_2m_max[i];
@@ -255,8 +257,8 @@ export function buildOutfitSuggestion(
     sub.prefName === sub.name ? sub.name : `${sub.prefName} ${sub.name}`;
   const w = wmo(code);
 
+  // メイン服装は添付イラストが表すため、本文では補足アドバイスのみ。
   const tips: string[] = [];
-  tips.push(`・${clothingByTemp(tmax)}`);
 
   if (tmax - tmin >= 8) {
     tips.push("・朝晩との寒暖差が大きいので、脱ぎ着しやすい重ね着を。");
@@ -290,7 +292,11 @@ export function buildOutfitSuggestion(
   const footer =
     "-# ※ 体感には個人差があります。寒がりな方は1段階厚めを目安に。";
 
-  return [header, "", summary, "", tips.join("\n"), "", footer].join("\n");
+  const lines = [header, "", summary];
+  if (tips.length > 0) lines.push("", tips.join("\n"));
+  lines.push("", footer);
+
+  return { content: lines.join("\n"), imageFile: outfitImageFile(tmax) };
 }
 
 // JIS 2-digit prefecture codes used by Yahoo 天気 URLs.
