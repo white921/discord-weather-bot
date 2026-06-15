@@ -8,6 +8,7 @@ import {
   INTL_CONTINENTS,
   findContinent,
   findCountry,
+  findCountryGroup,
 } from "../data/international.js";
 import { finalizeForecast, type FlowMode } from "./regionSelect.js";
 
@@ -48,7 +49,31 @@ function buildCountryRows(mode: FlowMode, contId: string) {
 function buildCityRows(mode: FlowMode, countryId: string) {
   const found = findCountry(countryId);
   if (!found) return null;
-  const buttons = found.country.cities.map((c) =>
+  const buttons = (found.country.cities ?? []).map((c) =>
+    new ButtonBuilder()
+      .setCustomId(`intl:pick:${mode}:${c.id}`)
+      .setLabel(c.name)
+      .setStyle(ButtonStyle.Secondary)
+  );
+  return buttonsToRows(buttons);
+}
+
+function buildGroupRows(mode: FlowMode, countryId: string) {
+  const found = findCountry(countryId);
+  if (!found?.country.groups) return null;
+  const buttons = found.country.groups.map((group) =>
+    new ButtonBuilder()
+      .setCustomId(`intl:group:${mode}:${countryId}__${group.id}`)
+      .setLabel(group.name)
+      .setStyle(ButtonStyle.Secondary)
+  );
+  return buttonsToRows(buttons);
+}
+
+function buildGroupedCityRows(mode: FlowMode, countryId: string, groupId: string) {
+  const found = findCountryGroup(countryId, groupId);
+  if (!found) return null;
+  const buttons = found.group.cities.map((c) =>
     new ButtonBuilder()
       .setCustomId(`intl:pick:${mode}:${c.id}`)
       .setLabel(c.name)
@@ -61,7 +86,7 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
   // customId: intl:<step>:<mode>:<value>
   const [, step, mode, value] = interaction.customId.split(":") as [
     "intl",
-    "cont" | "country" | "city" | "pick",
+    "cont" | "country" | "city" | "group" | "pick",
     FlowMode,
     string,
   ];
@@ -95,17 +120,56 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
   }
 
   if (step === "city") {
-    const rows = buildCityRows(mode, value);
-    if (!rows) {
+    const found = findCountry(value);
+    if (!found) {
       await interaction.update({ content: "国が見つかりません。", components: [] });
       return;
     }
-    const found = findCountry(value)!;
+
+    if (found.country.groups?.length) {
+      const rows = buildGroupRows(mode, value);
+      if (!rows) {
+        await interaction.update({ content: "地方区分が見つかりません。", components: [] });
+        return;
+      }
+      await interaction.update({
+        content:
+          mode === "favorite"
+            ? `お気に入り登録: ${found.country.name} の地方を選んでください。`
+            : `${found.country.name} の地方を選んでください。`,
+        components: rows,
+      });
+      return;
+    }
+
+    const rows = buildCityRows(mode, value);
+    if (!rows) {
+      await interaction.update({ content: "地域が見つかりません。", components: [] });
+      return;
+    }
     await interaction.update({
       content:
         mode === "favorite"
-          ? `お気に入り登録: ${found.country.name} の都市を選んでください。`
-          : `${found.country.name} の都市を選んでください。`,
+          ? `お気に入り登録: ${found.country.name} の地域を選んでください。`
+          : `${found.country.name} の地域を選んでください。`,
+      components: rows,
+    });
+    return;
+  }
+
+  if (step === "group") {
+    const [countryId, groupId] = value.split("__");
+    const found = findCountryGroup(countryId, groupId);
+    const rows = buildGroupedCityRows(mode, countryId, groupId);
+    if (!found || !rows) {
+      await interaction.update({ content: "地方区分が見つかりません。", components: [] });
+      return;
+    }
+    await interaction.update({
+      content:
+        mode === "favorite"
+          ? `お気に入り登録: ${found.country.name} > ${found.group.name} の省級行政区を選んでください。`
+          : `${found.country.name} > ${found.group.name} の省級行政区を選んでください。`,
       components: rows,
     });
     return;

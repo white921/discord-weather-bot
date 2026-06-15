@@ -9,10 +9,17 @@ export type IntlCity = {
   tz: string;
 };
 
-export type IntlCountry = {
+export type IntlCountryGroup = {
   id: string;
   name: string;
   cities: IntlCity[];
+};
+
+export type IntlCountry = {
+  id: string;
+  name: string;
+  cities?: IntlCity[];
+  groups?: IntlCountryGroup[];
 };
 
 export type IntlContinent = {
@@ -21,23 +28,90 @@ export type IntlContinent = {
   countries: IntlCountry[];
 };
 
+const CHINA_GROUPS: IntlCountryGroup[] = [
+  {
+    id: "cn-north",
+    name: "華北",
+    cities: [
+      { id: "intl-cn-beijing", name: "北京市", lat: 39.9042, lon: 116.4074, tz: "Asia/Shanghai" },
+      { id: "intl-cn-tianjin", name: "天津市", lat: 39.3434, lon: 117.3616, tz: "Asia/Shanghai" },
+      { id: "intl-cn-hebei", name: "河北省", lat: 38.0428, lon: 114.5149, tz: "Asia/Shanghai" },
+      { id: "intl-cn-shanxi", name: "山西省", lat: 37.8706, lon: 112.5489, tz: "Asia/Shanghai" },
+      { id: "intl-cn-inner-mongolia", name: "内モンゴル自治区", lat: 40.8426, lon: 111.7492, tz: "Asia/Shanghai" },
+    ],
+  },
+  {
+    id: "cn-northeast",
+    name: "東北",
+    cities: [
+      { id: "intl-cn-liaoning", name: "遼寧省", lat: 41.8057, lon: 123.4315, tz: "Asia/Shanghai" },
+      { id: "intl-cn-jilin", name: "吉林省", lat: 43.8171, lon: 125.3235, tz: "Asia/Shanghai" },
+      { id: "intl-cn-heilongjiang", name: "黒竜江省", lat: 45.8038, lon: 126.5349, tz: "Asia/Shanghai" },
+    ],
+  },
+  {
+    id: "cn-east",
+    name: "華東",
+    cities: [
+      { id: "intl-cn-shanghai", name: "上海市", lat: 31.2304, lon: 121.4737, tz: "Asia/Shanghai" },
+      { id: "intl-cn-jiangsu", name: "江蘇省", lat: 32.0603, lon: 118.7969, tz: "Asia/Shanghai" },
+      { id: "intl-cn-zhejiang", name: "浙江省", lat: 30.2741, lon: 120.1551, tz: "Asia/Shanghai" },
+      { id: "intl-cn-anhui", name: "安徽省", lat: 31.8206, lon: 117.2290, tz: "Asia/Shanghai" },
+      { id: "intl-cn-fujian", name: "福建省", lat: 26.0745, lon: 119.2965, tz: "Asia/Shanghai" },
+      { id: "intl-cn-jiangxi", name: "江西省", lat: 28.6820, lon: 115.8579, tz: "Asia/Shanghai" },
+      { id: "intl-cn-shandong", name: "山東省", lat: 36.6512, lon: 117.1201, tz: "Asia/Shanghai" },
+    ],
+  },
+  {
+    id: "cn-central",
+    name: "華中",
+    cities: [
+      { id: "intl-cn-henan", name: "河南省", lat: 34.7466, lon: 113.6254, tz: "Asia/Shanghai" },
+      { id: "intl-cn-hubei", name: "湖北省", lat: 30.5928, lon: 114.3055, tz: "Asia/Shanghai" },
+      { id: "intl-cn-hunan", name: "湖南省", lat: 28.2282, lon: 112.9388, tz: "Asia/Shanghai" },
+    ],
+  },
+  {
+    id: "cn-south",
+    name: "華南",
+    cities: [
+      { id: "intl-cn-guangdong", name: "広東省", lat: 23.1291, lon: 113.2644, tz: "Asia/Shanghai" },
+      { id: "intl-cn-guangxi", name: "広西チワン族自治区", lat: 22.8170, lon: 108.3669, tz: "Asia/Shanghai" },
+      { id: "intl-cn-hainan", name: "海南省", lat: 20.0442, lon: 110.1999, tz: "Asia/Shanghai" },
+      { id: "intl-cn-hong-kong", name: "香港特別行政区", lat: 22.3193, lon: 114.1694, tz: "Asia/Hong_Kong" },
+      { id: "intl-cn-macau", name: "マカオ特別行政区", lat: 22.1987, lon: 113.5439, tz: "Asia/Macau" },
+    ],
+  },
+  {
+    id: "cn-southwest",
+    name: "西南",
+    cities: [
+      { id: "intl-cn-chongqing", name: "重慶市", lat: 29.5630, lon: 106.5516, tz: "Asia/Shanghai" },
+      { id: "intl-cn-sichuan", name: "四川省", lat: 30.5728, lon: 104.0668, tz: "Asia/Shanghai" },
+      { id: "intl-cn-guizhou", name: "貴州省", lat: 26.6470, lon: 106.6302, tz: "Asia/Shanghai" },
+      { id: "intl-cn-yunnan", name: "雲南省", lat: 25.0389, lon: 102.7183, tz: "Asia/Shanghai" },
+      { id: "intl-cn-tibet", name: "チベット自治区", lat: 29.6520, lon: 91.1721, tz: "Asia/Shanghai" },
+    ],
+  },
+  {
+    id: "cn-northwest",
+    name: "西北",
+    cities: [
+      { id: "intl-cn-shaanxi", name: "陝西省", lat: 34.3416, lon: 108.9398, tz: "Asia/Shanghai" },
+      { id: "intl-cn-gansu", name: "甘粛省", lat: 36.0611, lon: 103.8343, tz: "Asia/Shanghai" },
+      { id: "intl-cn-qinghai", name: "青海省", lat: 36.6171, lon: 101.7782, tz: "Asia/Shanghai" },
+      { id: "intl-cn-ningxia", name: "寧夏回族自治区", lat: 38.4872, lon: 106.2309, tz: "Asia/Shanghai" },
+      { id: "intl-cn-xinjiang", name: "新疆ウイグル自治区", lat: 43.8256, lon: 87.6168, tz: "Asia/Shanghai" },
+    ],
+  },
+];
+
 export const INTL_CONTINENTS: IntlContinent[] = [
   {
     id: "asia",
     name: "アジア",
     countries: [
-      { id: "cn", name: "中国", cities: [
-        { id: "intl-cn-beijing", name: "北京", lat: 39.9042, lon: 116.4074, tz: "Asia/Shanghai" },
-        { id: "intl-cn-shanghai", name: "上海", lat: 31.2304, lon: 121.4737, tz: "Asia/Shanghai" },
-        { id: "intl-cn-guangzhou", name: "広州", lat: 23.1291, lon: 113.2644, tz: "Asia/Shanghai" },
-        { id: "intl-cn-shenzhen", name: "深圳", lat: 22.5431, lon: 114.0579, tz: "Asia/Shanghai" },
-        { id: "intl-cn-chengdu", name: "成都", lat: 30.5728, lon: 104.0668, tz: "Asia/Shanghai" },
-        { id: "intl-cn-hk", name: "香港", lat: 22.3193, lon: 114.1694, tz: "Asia/Hong_Kong" },
-        { id: "intl-cn-east", name: "東部", lat: 31.0, lon: 121.0, tz: "Asia/Shanghai" },
-        { id: "intl-cn-west", name: "西部", lat: 36.0, lon: 95.0, tz: "Asia/Shanghai" },
-        { id: "intl-cn-north", name: "北部", lat: 42.0, lon: 120.0, tz: "Asia/Shanghai" },
-        { id: "intl-cn-south", name: "南部", lat: 23.0, lon: 113.0, tz: "Asia/Shanghai" },
-      ]},
+      { id: "cn", name: "中国", groups: CHINA_GROUPS },
       { id: "kr", name: "韓国", cities: [
         { id: "intl-kr-seoul", name: "ソウル", lat: 37.5665, lon: 126.978, tz: "Asia/Seoul" },
         { id: "intl-kr-busan", name: "釜山", lat: 35.1796, lon: 129.0756, tz: "Asia/Seoul" },
@@ -274,11 +348,27 @@ export function findCountry(id: string): { continent: IntlContinent; country: In
   return undefined;
 }
 
+export function findCountryGroup(
+  countryId: string,
+  groupId: string
+): { country: IntlCountry; group: IntlCountryGroup } | undefined {
+  const found = findCountry(countryId);
+  if (!found?.country.groups) return undefined;
+  const group = found.country.groups.find((g) => g.id === groupId);
+  if (!group) return undefined;
+  return { country: found.country, group };
+}
+
 export function findIntlCity(id: string): { country: IntlCountry; city: IntlCity } | undefined {
   for (const c of INTL_CONTINENTS) {
     for (const country of c.countries) {
-      const city = country.cities.find((cc) => cc.id === id);
-      if (city) return { country, city };
+      for (const city of country.cities ?? []) {
+        if (city.id === id) return { country, city };
+      }
+      for (const group of country.groups ?? []) {
+        const city = group.cities.find((cc) => cc.id === id);
+        if (city) return { country, city };
+      }
     }
   }
   return undefined;
@@ -286,7 +376,7 @@ export function findIntlCity(id: string): { country: IntlCountry; city: IntlCity
 
 export const ALL_INTL_CITIES = INTL_CONTINENTS.flatMap((c) =>
   c.countries.flatMap((country) =>
-    country.cities.map((city) => ({
+    [...(country.cities ?? []), ...(country.groups?.flatMap((group) => group.cities) ?? [])].map((city) => ({
       ...city,
       countryName: country.name,
       countryId: country.id,
