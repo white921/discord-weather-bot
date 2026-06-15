@@ -30,7 +30,37 @@ function buttonsToRows(buttons: ButtonBuilder[]): ActionRowBuilder<ButtonBuilder
   );
 }
 
-export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
+type SelectionView = {
+  content: string;
+  components: ActionRowBuilder<ButtonBuilder>[];
+};
+
+function withBackButton(
+  rows: ActionRowBuilder<ButtonBuilder>[],
+  customId: string,
+  label: string = "戻る"
+): ActionRowBuilder<ButtonBuilder>[] {
+  return [
+    ...rows,
+    new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(customId)
+        .setLabel(label)
+        .setStyle(ButtonStyle.Secondary)
+    ),
+  ];
+}
+
+function findAreaIdByPrefecture(prefId: string): string | null {
+  for (const area of AREAS) {
+    if (area.prefectures.some((pref) => pref.id === prefId)) {
+      return area.id;
+    }
+  }
+  return null;
+}
+
+function buildAreaSelectionView(mode: FlowMode): SelectionView {
   const buttons = AREAS.map((a) =>
     new ButtonBuilder()
       .setCustomId(`region:area:${mode}:${a.id}`)
@@ -49,6 +79,12 @@ export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
         ? "お気に入り登録: 地方を選んでください。"
         : "地方を選んでください。",
     components: buttonsToRows(buttons),
+  };
+}
+
+export function buildAreaButtons(mode: FlowMode): InteractionReplyOptions {
+  return {
+    ...buildAreaSelectionView(mode),
     flags: MessageFlags.Ephemeral,
   };
 }
@@ -88,10 +124,15 @@ function buildSubRows(mode: FlowMode, prefId: string) {
 export async function handleRegionButton(interaction: ButtonInteraction) {
   const [, step, mode, value] = interaction.customId.split(":") as [
     "region",
-    "area" | "pref" | "sub",
+    "root" | "area" | "pref" | "sub",
     FlowMode,
     string,
   ];
+
+  if (step === "root") {
+    await interaction.update(buildAreaSelectionView(mode));
+    return;
+  }
 
   if (step === "area") {
     const rows = buildPrefRows(mode, value);
@@ -104,7 +145,7 @@ export async function handleRegionButton(interaction: ButtonInteraction) {
         mode === "favorite"
           ? "お気に入り登録: 都道府県を選んでください。"
           : "都道府県を選んでください。",
-      components: rows,
+      components: withBackButton(rows, `region:root:${mode}:start`),
     });
     return;
   }
@@ -120,12 +161,17 @@ export async function handleRegionButton(interaction: ButtonInteraction) {
       return;
     }
     const rows = buildSubRows(mode, value)!;
+    const areaId = findAreaIdByPrefecture(value);
+    if (!areaId) {
+      await interaction.update({ content: "地方が見つかりません。", components: [] });
+      return;
+    }
     await interaction.update({
       content:
         mode === "favorite"
           ? "お気に入り登録: 地域を選んでください。"
           : "地域を選んでください。",
-      components: rows,
+      components: withBackButton(rows, `region:area:${mode}:${areaId}`),
     });
     return;
   }

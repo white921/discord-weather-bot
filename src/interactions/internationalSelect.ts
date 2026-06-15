@@ -24,6 +24,22 @@ function buttonsToRows(buttons: ButtonBuilder[]): ActionRowBuilder<ButtonBuilder
   );
 }
 
+function withBackButton(
+  rows: ActionRowBuilder<ButtonBuilder>[],
+  customId: string,
+  label: string = "戻る"
+): ActionRowBuilder<ButtonBuilder>[] {
+  return [
+    ...rows,
+    new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(customId)
+        .setLabel(label)
+        .setStyle(ButtonStyle.Secondary)
+    ),
+  ];
+}
+
 function buildContinentRows(mode: FlowMode) {
   const buttons = INTL_CONTINENTS.map((c) =>
     new ButtonBuilder()
@@ -98,7 +114,7 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
         mode === "favorite"
           ? "お気に入り登録: 大陸を選んでください。"
           : "大陸を選んでください。",
-      components: buildContinentRows(mode),
+      components: withBackButton(buildContinentRows(mode), `region:root:${mode}:start`),
     });
     return;
   }
@@ -114,7 +130,7 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
         mode === "favorite"
           ? "お気に入り登録: 国を選んでください。"
           : "国を選んでください。",
-      components: rows,
+      components: withBackButton(rows, `intl:cont:${mode}:start`),
     });
     return;
   }
@@ -137,7 +153,10 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
           mode === "favorite"
             ? `お気に入り登録: ${found.country.name} の地方を選んでください。`
             : `${found.country.name} の地方を選んでください。`,
-        components: rows,
+        components: withBackButton(
+          rows,
+          `intl:country:${mode}:${found.continent.id}`
+        ),
       });
       return;
     }
@@ -152,7 +171,7 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
         mode === "favorite"
           ? `お気に入り登録: ${found.country.name} の地域を選んでください。`
           : `${found.country.name} の地域を選んでください。`,
-      components: rows,
+      components: withBackButton(rows, `intl:country:${mode}:${found.continent.id}`),
     });
     return;
   }
@@ -170,7 +189,7 @@ export async function handleIntlButton(interaction: ButtonInteraction) {
         mode === "favorite"
           ? `お気に入り登録: ${found.country.name} > ${found.group.name} の省級行政区を選んでください。`
           : `${found.country.name} > ${found.group.name} の省級行政区を選んでください。`,
-      components: rows,
+      components: withBackButton(rows, `intl:city:${mode}:${countryId}`),
     });
     return;
   }
