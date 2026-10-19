@@ -16,7 +16,7 @@ Discord 上で天気予報を確認できる Bot。TC に常設パネルを置�
 
 ## 必要環境
 
-- Node.js 20+
+- Node.js 22+
 - MySQL 8+
 - Discord Application & Bot Token
 
