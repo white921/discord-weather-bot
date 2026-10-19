@@ -48,8 +48,13 @@ npm run build
 npm start
 ```
 
+Railway では `railway.toml` により、デプロイ前に
+`npx prisma migrate deploy`、起動時に `npm start` を実行します。
+`DISCORD_TOKEN`、`DISCORD_CLIENT_ID`、`DISCORD_GUILD_IDS`、
+`DATABASE_URL`、`FAVORITES_ENC_KEY` をサービスの環境変数に設定してください。
+
 ## 注意
 
-- お気に入り地域は平文で DB に保存されます（DB アクセス制御で保護）
+- お気に入り地域は `FAVORITES_ENC_KEY` を使って暗号化して DB に保存されます
 - お気に入り未登録時は DM 通知を ON にできません
 - お気に入り解除時は通知も自動停止されます
