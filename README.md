@@ -48,7 +48,7 @@ npm run build
 npm start
 ```
 
-Railway では `railway.toml` により、デプロイ前に
+Railway では `.railway/railway.ts` により、デプロイ前に
 `npx prisma migrate deploy`、起動時に `npm start` を実行します。
 `DISCORD_TOKEN`、`DISCORD_CLIENT_ID`、`DISCORD_GUILD_IDS`、
 `DATABASE_URL`、`FAVORITES_ENC_KEY` をサービスの環境変数に設定してください。
