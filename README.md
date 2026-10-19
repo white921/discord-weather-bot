@@ -49,9 +49,15 @@ npm start
 ```
 
 Railway では `.railway/railway.ts` により、デプロイ前に
-`npx prisma migrate deploy`、起動時に `npm start` を実行します。
+`npx prisma migrate deploy`、起動時に `node dist/index.js` を実行します。
 `DISCORD_TOKEN`、`DISCORD_CLIENT_ID`、`DISCORD_GUILD_IDS`、
 `DATABASE_URL`、`FAVORITES_ENC_KEY` をサービスの環境変数に設定してください。
+
+小規模運用時の MySQL は、次の起動設定を使用します。
+
+```text
+docker-entrypoint.sh mysqld --innodb-use-native-aio=0 --disable-log-bin --performance_schema=0 --innodb-buffer-pool-size=128M --max-connections=10
+```
 
 ## 注意
 

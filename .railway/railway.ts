@@ -14,8 +14,16 @@ export default defineRailway(() => {
       buildCommand: "npm run build",
       buildEnvironment: "V3",
       builder: "NIXPACKS",
+      watchPatterns: [
+        "/src/**",
+        "/assets/**",
+        "/prisma/**",
+        "/package.json",
+        "/package-lock.json",
+        "/tsconfig.json",
+      ],
     },
-    start: "npm start",
+    start: "node dist/index.js",
     preDeploy: "npx prisma migrate deploy",
     replicas: { "asia-southeast1-eqsg3a": 1 },
   });
